@@ -12,8 +12,14 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Poppins', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                primaryblue: '#001A6E', 
+                hover: '#00124C',
+                deskripsi: '#03346E',
+                card : '#EFE4D2'
+            }
         },
     },
 
