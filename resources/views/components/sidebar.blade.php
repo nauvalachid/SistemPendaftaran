@@ -36,12 +36,20 @@
                 <span class="mx-4 text-sm font-medium">Konten</span>
             </a>
         </nav>
+        
+        <!-- LOGOUT -->
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
 
-        <a class="flex transform items-center rounded-lg px-3 py-2 text-gray-500 transition-colors duration-300 hover:bg-red-100 hover:text-red-700" href="#">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
-            </svg>
-            <span class="mx-4 text-sm font-medium">Logout</span>
-        </a>
+            <a href="{{ route('logout') }}"
+               onclick="event.preventDefault(); this.closest('form').submit();"
+               class="flex transform items-center rounded-lg px-3 py-2 text-gray-500 transition-colors duration-300 hover:bg-red-100 hover:text-red-700">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                </svg>
+                <span class="mx-4 text-sm font-medium">Logout</span>
+            </a>
+        </form>
     </div>
 </aside>
