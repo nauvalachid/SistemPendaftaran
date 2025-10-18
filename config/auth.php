@@ -40,6 +40,16 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        // ADMIN GUARD
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admin', // Mengacu ke provider 'admins'
+        ],
+        // TATA USAHA GUARD
+        'tata_usaha' => [
+            'driver' => 'session',
+            'provider' => 'tata_usaha', // Mengacu ke provider 'tata_usahas'
+        ],
     ],
 
     /*
@@ -65,10 +75,10 @@ return [
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'admin' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class, // HARUS menunjuk ke Model yang benar
+        ],
     ],
 
     /*
