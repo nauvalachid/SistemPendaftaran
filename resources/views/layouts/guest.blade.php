@@ -7,30 +7,29 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+        <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-gray-900 antialiased">
         
-        {{-- BLOK BARU UNTUK LOGO DI POJOK KIRI ATAS --}}
-        <div class="absolute top-0 left-0 p-6">
-            <a href="/">
-                <div class="flex items-center space-x-2">
-                    <img src="{{ asset('storage/logosd.png') }}" alt="Logo" class="w-70 h-12">
-                </div>
-            </a>
+        {{-- BAGIAN INI KITA UBAH --}}
+        <div class="min-h-screen bg-gray-100">
+            
+            {{-- 1. Panggil Navbar di sini --}}
+            {{-- Kita bungkus dengan container agar padding-nya konsisten --}}
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                @include('partials.navbar')
+            </div>
+
+            {{-- 2. Konten utama ($slot) akan ditampilkan di bawah navbar --}}
+            <main>
+                {{ $slot }}
+            </main>
         </div>
-        {{-- AKHIR BLOK LOGO --}}
         
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            
-            {{-- Slot $logo dihilangkan atau tidak diisi karena logo sudah ada di atas --}}
-            
-           <div class="w-full sm:max-w-md mt-6 px-6 py-8 bg-white shadow-xl overflow-hidden rounded-3xl">
-    {{ $slot }}
-</div>
-        </div>
     </body>
 </html>

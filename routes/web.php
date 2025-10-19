@@ -9,6 +9,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::post('/store', [PendaftaranController::class, 'store'])->name('pendaftaran.store');
+Route::get('/create', [PendaftaranController::class, 'create'])->name('pendaftaran.create');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -17,8 +20,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::post('/store', [PendaftaranController::class, 'store'])->name('pendaftaran.store');
-    Route::get('/create', [PendaftaranController::class, 'create'])->name('pendaftaran.create');
     Route::get('/pendaftaran/{pendaftaran}', [PendaftaranController::class, 'show'])->name('pendaftaran.show');
 });
 
