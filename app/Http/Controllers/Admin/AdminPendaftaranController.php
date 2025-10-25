@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin; // PENTING: Gunakan namespace Admin
+namespace App\Http\Controllers\Admin; 
 
 use App\Http\Controllers\Controller;
 use App\Models\Pendaftaran;
@@ -39,10 +39,10 @@ class AdminPendaftaranController extends Controller
     }
     
     /**
-     * Mengunduh file dokumen dari pendaftaran.
-     * URL: /admin/pendaftaran/{id}/download/{field}
+     * Mengunduh atau menampilkan file dokumen dari pendaftaran berdasarkan parameter 'action'.
+     * URL: /admin/pendaftaran/{id}/download/{field}?action={view/download}
      */
-    public function download(Pendaftaran $pendaftaran, string $field)
+    public function download(Request $request, Pendaftaran $pendaftaran, string $field)
     {
         // 1. Validasi Field: Pastikan field yang diminta ada dalam daftar dokumen yang sah
         if (!in_array($field, $this->documentFields)) {
@@ -56,7 +56,17 @@ class AdminPendaftaranController extends Controller
             abort(404, 'File tidak ada atau telah dihapus.');
         }
 
-        // 3. Paksa Unduh File
+        // Ambil parameter action dari query string (default: download)
+        $action = $request->query('action', 'download');
+
+        // 3. Tentukan Aksi (View atau Download)
+        if ($action === 'view') {
+            // Gunakan response() untuk menampilkan file (browser akan menangani MIME type)
+            // Ini akan membuat file seperti PDF atau gambar dibuka di tab baru.
+            return Storage::disk('public')->response($filePath);
+        }
+
+        // Default: Gunakan download() untuk memaksa unduh
         return Storage::disk('public')->download($filePath);
     }
 
