@@ -4,23 +4,51 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PendaftaranController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminPendaftaranController;
+use Illuminate\Http\Request;
+use App\Models\Pendaftaran;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('/store', [PendaftaranController::class, 'store'])->name('pendaftaran.store');
-Route::get('/create', [PendaftaranController::class, 'create'])->name('pendaftaran.create');
-
 Route::get('/dashboard', function () {
+    // Cek apakah ada data pendaftaran yang tersimpan di session
+    if (session()->has('pending_pendaftaran')) {
+        
+        $pendingData = session('pending_pendaftaran');
+        session()->forget('pending_pendaftaran'); // Langsung hapus session
+
+        // Cek lagi apakah user ini sudah pernah mendaftar
+        if (Pendaftaran::where('id_user', Auth::id())->exists()) {
+            // Jika ternyata sudah ada, beri info dan jangan buat data baru
+            return redirect()->route('dashboard')->with('info', 'Anda sudah pernah mendaftar sebelumnya.');
+        }
+        
+        // Buat data pendaftaran dari data session
+        $pendaftaran = Pendaftaran::create(array_merge(
+            ['id_user' => Auth::id()],
+            $pendingData
+        ));
+        
+        // Arahkan ke halaman detail pendaftaran dengan pesan sukses
+        return redirect()->route('pendaftaran.show', $pendaftaran->id)
+            ->with('success', 'Pendaftaran Anda berhasil diselesaikan!');
+    }
+    
+    // Jika tidak ada data di session, tampilkan dashboard seperti biasa
     return view('dashboard');
+    
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // Profile Routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Pendaftaran Routes
     Route::get('/pendaftaran/{pendaftaran}', [PendaftaranController::class, 'show'])->name('pendaftaran.show');
+    Route::post('/store', [PendaftaranController::class, 'store'])->name('pendaftaran.store');
+Route::get('/create', [PendaftaranController::class, 'create'])->name('pendaftaran.create');
 });
 
 require __DIR__.'/auth.php';
