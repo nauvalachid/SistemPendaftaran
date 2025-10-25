@@ -4,9 +4,6 @@
         <!-- Sidebar -->
     <x-sidebar />
 
-        {{-- =============================================================== --}}
-        {{-- |                      KONTEN UTAMA DASHBOARD                   | --}}
-        {{-- =============================================================== --}}
         <main class="w-full overflow-y-auto p-8 lg:p-12">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Dashboard Admin</h1>

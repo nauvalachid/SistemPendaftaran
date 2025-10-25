@@ -1,51 +1,101 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Dashboard')
+@section('title', 'Dashboard Admin')
 
 @section('content')
-<div class="py-12">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">Halo, {{ Auth::guard('admin')->user()->nama ?? 'Admin' }}!</h1>
-        
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900">
-                Selamat datang di Admin Dashboard Sistem Pendaftaran.
-                Di sini Anda dapat memantau dan mengelola seluruh proses pendaftaran, konten, dan pengguna sistem.
-            </div>
+<div class="flex min-h-screen bg-gray-50">
+    <!-- Sidebar component is included here as requested in the new structure -->
+    <x-sidebar />
+
+    <main class="w-full overflow-y-auto p-8 lg:p-12">
+        <div>
+            {{-- Mengambil nama admin dari guard 'admin' --}}
+            <h1 class="text-3xl font-bold text-gray-900">Halo, {{ Auth::guard('admin')->user()->nama ?? 'Admin' }}!</h1>
+            <p class="mt-2 text-gray-600">Selamat datang di Dashboard Admin Sistem Pendaftaran.</p>
         </div>
 
-        {{-- Contoh Kotak Ringkasan Data --}}
-        <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
-            
-            {{-- Total Pendaftaran --}}
-            <div class="bg-white overflow-hidden shadow sm:rounded-lg p-5">
-                <div class="text-sm font-medium text-gray-500 truncate">Total Pendaftaran Masuk</div>
-                <div class="mt-1 text-3xl font-semibold text-indigo-600">
-                    {{-- Ganti dengan data count dari Controller --}}
-                    {{ '125' }}
-                </div>
-                <a href="{{ route('admin.pendaftaran.index') }}" class="text-sm text-indigo-500 hover:text-indigo-700 mt-2 block">Lihat Detail</a>
+        <hr class="my-8 h-px border-0 bg-gray-200">
+
+        <div class="rounded-xl border bg-white p-6 shadow-lg">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">Ringkasan Pendaftaran</h2>
+                {{-- Menggunakan route dari template lama untuk detail --}}
+                <a href="{{ route('admin.pendaftaran.index') }}" class="flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800">
+                    Lihat Detail
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="ml-1 h-4 w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                </a>
             </div>
 
-            {{-- Pendaftaran Belum Diverifikasi --}}
-            <div class="bg-white overflow-hidden shadow sm:rounded-lg p-5">
-                <div class="text-sm font-medium text-gray-500 truncate">Perlu Diverifikasi</div>
-                <div class="mt-1 text-3xl font-semibold text-orange-500">
-                    {{ '25' }} 
+            <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                
+                {{-- 1. Total Pendaftar (Menggunakan data '125' dari template lama sebagai placeholder) --}}
+                <div class="flex items-center gap-x-4">
+                    <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6"><path d="M4.5 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM14.25 8.625a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0zM5.25 15.375a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5zM15 15.375a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z"></path></svg>
+                    </div>
+                    <div>
+                        {{-- Ganti '125' dengan variabel dinamis Anda, misal: $totalPendaftar --}}
+                        <p class="text-2xl font-bold text-gray-900">{{ $totalPendaftar ?? '125' }}</p>
+                        <p class="text-sm text-gray-600">Total Pendaftar</p>
+                    </div>
                 </div>
-                <span class="text-sm text-gray-500 mt-2 block">Menunggu Tindakan TU/Admin</span>
-            </div>
-            
-            {{-- Pengguna Aktif --}}
-            <div class="bg-white overflow-hidden shadow sm:rounded-lg p-5">
-                <div class="text-sm font-medium text-gray-500 truncate">Pengguna Terdaftar</div>
-                <div class="mt-1 text-3xl font-semibold text-green-600">
-                    {{ '450' }}
+                
+                {{-- 2. Diterima --}}
+                <div class="flex items-center gap-x-4">
+                    <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6"><path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 15a.75.75 0 01-1.121.237l-6-5.25a.75.75 0 01.99-1.125l5.314 4.659 8.358-13.929a.75.75 0 011.04-.208z" clip-rule="evenodd" /></svg>
+                    </div>
+                    <div>
+                        {{-- Ganti '9' dengan variabel dinamis Anda, misal: $totalDiterima --}}
+                        <p class="text-2xl font-bold text-gray-900">{{ $totalDiterima ?? '90' }}</p>
+                        <p class="text-sm text-gray-600">Diterima</p>
+                    </div>
                 </div>
-                <span class="text-sm text-gray-500 mt-2 block">Total Akun User</span>
+
+                {{-- 3. Ditolak --}}
+                <div class="flex items-center gap-x-4">
+                    <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6"><path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <div>
+                        {{-- Ganti '5' dengan variabel dinamis Anda, misal: $totalDitolak --}}
+                        <p class="text-2xl font-bold text-gray-900">{{ $totalDitolak ?? '10' }}</p>
+                        <p class="text-sm text-gray-600">Ditolak</p>
+                    </div>
+                </div>
+
+                {{-- 4. Pending / Belum Diverifikasi (Menggunakan data '25' dari template lama sebagai placeholder) --}}
+                <div class="flex items-center gap-x-4">
+                    <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 text-yellow-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6"><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <div>
+                        {{-- Ganti '3' dengan variabel dinamis Anda, misal: $totalPending --}}
+                        <p class="text-2xl font-bold text-gray-900">{{ $totalPending ?? '25' }}</p>
+                        <p class="text-sm text-gray-600">Pending Verifikasi</p>
+                    </div>
+                </div>
+
             </div>
         </div>
         
-    </div>
+        {{-- Menambahkan card untuk Total Pengguna Terdaftar dari template lama --}}
+        <div class="rounded-xl border bg-white p-6 shadow-lg mt-8">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Statistik Pengguna Sistem</h2>
+            <div class="flex items-center gap-x-4">
+                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 text-purple-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.16-1.279-.441-1.857M7 20v-2c0-.653.16-1.279.441-1.857m0 0a3 3 0 014.54-1.857m0 0a3 3 0 004.54-1.857m-9.08 0a3 3 0 01.356-.63M7 17a3 3 0 014.54-1.857m0 0a3 3 0 004.54-1.857M10 9a3 3 0 11-6 0 3 3 0 016 0zM17 9a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </div>
+                <div>
+                    {{-- Ganti '450' dengan variabel dinamis Anda, misal: $totalUsers --}}
+                    <p class="text-2xl font-bold text-gray-900">{{ $totalUsers ?? '450' }}</p>
+                    <p class="text-sm text-gray-600">Total Akun User Terdaftar</p>
+                </div>
+            </div>
+        </div>
+        
+    </main>
 </div>
 @endsection
