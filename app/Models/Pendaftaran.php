@@ -29,6 +29,7 @@ class Pendaftaran extends Model
         'agama',
         'asal_sekolah',
         'alamat',
+        'status',
         
         // Atribut Orang Tua
         'nama_ayah',

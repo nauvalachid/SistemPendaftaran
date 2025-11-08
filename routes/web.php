@@ -5,6 +5,7 @@ use App\Http\Controllers\PendaftaranController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminPendaftaranController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminExportController;
 use Illuminate\Http\Request;
 use App\Models\Pendaftaran;
 
@@ -80,7 +81,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('pendaftaran/{pendaftaran}/download/{field}', [AdminPendaftaranController::class, 'download'])
             ->name('pendaftaran.download');
 
-        // ----------------------------------------------------------------------
+        // 3. Rute Export Data Pendaftar
+        Route::get('/export/pendaftaran', [AdminExportController::class, 'export'])->name('export.pendaftaran');
+
 
         // ... Tambahkan rute CRUD Admin lainnya di sini
     });
