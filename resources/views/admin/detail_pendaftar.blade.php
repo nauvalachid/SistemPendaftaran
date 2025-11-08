@@ -55,6 +55,10 @@
                                 <dt class="text-sm font-medium text-gray-500">Nama Lengkap Siswa</dt>
                                 <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 font-semibold">{{ $pendaftaran->nama_siswa }}</dd>
                             </div>
+                            <div class="bg-gray-50 px-3 py-3 sm:grid sm:grid-cols-3 sm:gap-4">
+                                <dt class="text-sm font-medium text-gray-500">Status</dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 font-semibold">{{ $pendaftaran->status }}</dd>
+                            </div>
                         </dl>
                     </div>
                 </div>
@@ -107,7 +111,7 @@
                         </div>
                         <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt class="text-sm font-medium text-gray-500">Nomor Telepon Orang Tua</dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $pendaftaran->no_telp_ortu ?? '-' }}</dd>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $pendaftaran->no_telp ?? '-' }}</dd>
                         </div>
                         
                         <!-- BARIS KONTAK USER -->
