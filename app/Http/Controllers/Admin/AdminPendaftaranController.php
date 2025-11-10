@@ -19,13 +19,70 @@ class AdminPendaftaranController extends Controller
     /**
      * Menampilkan daftar semua pendaftaran.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil semua data pendaftaran, urutkan dari yang terbaru, dan sertakan data User
-        $pendaftarans = Pendaftaran::with('user')->latest()->paginate(15); 
+        // 1. Inisialisasi query dengan eager loading relasi User
+        $pendaftarQuery = Pendaftaran::with('user');
+
+        // 2. Filter Global (Input Cari)
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $pendaftarQuery->where(function ($query) use ($search) {
+                // Pencarian di Nama Siswa, NISN, dan Asal Sekolah
+                $query->where('nama_siswa', 'like', '%' . $search . '%')
+                      ->orWhere('nisn', 'like', '%' . $search . '%')
+                      ->orWhere('asal_sekolah', 'like', '%' . $search . '%');
+            });
+        }
+
+        // 3. Filter Status
+        if ($request->filled('status') && $request->input('status') !== 'all') {
+            $pendaftarQuery->where('status', $request->input('status'));
+        }
+
+        // 4. Filter Tanggal Daftar (Berdasarkan created_at)
+        if ($request->filled('tanggal_daftar')) {
+            // Memfilter berdasarkan tanggal tertentu (YYYY-MM-DD)
+            $date = $request->input('tanggal_daftar');
+            $pendaftarQuery->whereDate('created_at', $date);
+        }
+
+        // 5. Filter Asal Sekolah
+        if ($request->filled('asal_sekolah') && $request->input('asal_sekolah') !== 'all') {
+            $pendaftarQuery->where('asal_sekolah', $request->input('asal_sekolah'));
+        }
         
-        return view('admin.data_pendaftar', compact('pendaftarans'));
+        // 6. Pengurutan
+        $sortBy = $request->input('sort_by', 'latest'); // Default: terbaru
+        
+        if ($sortBy === 'nama_asc') {
+            $pendaftarQuery->orderBy('nama_siswa', 'asc');
+        } elseif ($sortBy === 'nama_desc') {
+             $pendaftarQuery->orderBy('nama_siswa', 'desc');
+        } else {
+             // Default: Pengurutan berdasarkan ID terbaru (paling baru mendaftar)
+             $pendaftarQuery->latest('id_pendaftaran'); 
+        }
+
+        // Ambil data yang sudah difilter dan lakukan pagination
+        $pendaftarans = $pendaftarQuery->paginate(15); 
+        
+        // Ambil daftar unik Asal Sekolah untuk dropdown filter di View
+        $list_sekolah = Pendaftaran::select('asal_sekolah')
+                                   ->distinct()
+                                   ->whereNotNull('asal_sekolah')
+                                   ->pluck('asal_sekolah')
+                                   ->sort()
+                                   ->toArray();
+
+        // Daftar status yang mungkin untuk filter
+        $list_status = ['Pending', 'Diterima', 'Ditolak'];
+
+        // Kirim data yang sudah difilter, list filter, dan nilai request saat ini
+        // Nilai request (query string) dikirim agar form filter/pencarian tetap terisi
+        return view('admin.data_pendaftar', compact('pendaftarans', 'list_sekolah', 'list_status'));
     }
+
 
     /**
      * Menampilkan detail lengkap satu pendaftaran.

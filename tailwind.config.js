@@ -23,5 +23,23 @@ export default {
         },
     },
 
+    safelist: [
+    // Kelas untuk Status 'Pending'
+    'bg-yellow-100',
+    'text-yellow-800',
+
+    // Kelas untuk Status 'Diterima'
+    'bg-green-100',
+    'text-green-800',
+
+    // Kelas untuk Status 'Ditolak'
+    'bg-red-100',
+    'text-red-800',
+    
+    // Kelas default jika status tidak ditemukan
+    'bg-gray-100',
+    'text-gray-800',
+    ],
+
     plugins: [forms],
 };

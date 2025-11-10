@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class PendaftaranController extends Controller
 {
@@ -31,8 +32,26 @@ class PendaftaranController extends Controller
      */
     public function store(Request $request)
     {
-        // Langkah 1: Validasi semua input terlebih dahulu, siapa pun yang mengirim.
+        // Langkah 1: Validasi semua input terlebih dahulu.
         $validatedData = $this->validatePendaftaran($request);
+
+        // --- 1.5. Proses Penggabungan Tempat & Tanggal Lahir ---
+        $tempat_lahir = $validatedData['tempat_lahir'];
+        $tanggal_lahir_raw = $validatedData['tanggal_lahir'];
+
+        // Mengubah format tanggal (dari YYYY-MM-DD menjadi DD-MM-YYYY)
+        $tanggal_lahir_formatted = Carbon::parse($tanggal_lahir_raw)->format('d-m-Y');
+
+        // Gabungkan menjadi format yang disimpan di database: "Kota, DD-MM-YYYY"
+        $tempat_tgl_lahir_final = $tempat_lahir . ', ' . $tanggal_lahir_formatted;
+
+        // Inject nilai gabungan ke $validatedData
+        $validatedData['tempat_tgl_lahir'] = $tempat_tgl_lahir_final;
+
+        // Hapus field input mentah
+        unset($validatedData['tempat_lahir']);
+        unset($validatedData['tanggal_lahir']);
+        // --------------------------------------------------------
 
         // KONDISI A: Jika pengguna SUDAH LOGIN
         if (Auth::check()) {
@@ -50,13 +69,14 @@ class PendaftaranController extends Controller
             ));
             
             // Arahkan ke halaman detail pendaftaran dengan pesan sukses.
-            return redirect()->route('pendaftaran.show', $pendaftaran->id)
-                ->with('success', 'Pendaftaran berhasil dikirim!');
+            return redirect()->route('pendaftaran.create')
+                ->with('success', 'Pendaftaran berhasil dikirim! Silahkan cek status pendaftaran Anda.');
         } 
         
         // KONDISI B: Jika pengguna adalah PENGUNJUNG (BELUM LOGIN)
         else {
             // Langkah 2: Upload file terlebih dahulu dan dapatkan path-nya.
+            // Catatan: Pastikan logika uploadDocuments Anda menyimpan file secara sementara atau permanen.
             $filePaths = $this->uploadDocuments($request);
             
             // Langkah 3: Gabungkan data teks dan path file yang sudah di-upload.
@@ -90,19 +110,31 @@ class PendaftaranController extends Controller
 
     protected function validatePendaftaran(Request $request): array
     {
+        // Memodifikasi helper untuk memvalidasi tempat_lahir dan tanggal_lahir secara terpisah.
         return $request->validate([
+            // Data Siswa
             'nama_siswa' => 'required|string|max:255',
-            'tempat_tgl_lahir' => 'required|string|max:255',
+            'nisn' => 'nullable|string|max:10',
+            'no_telp' => 'nullable|string|max:15',
+            
+            // Kolom input terpisah
+            'tempat_lahir' => 'required|string|max:100', 
+            'tanggal_lahir' => 'required|date', 
+            
             'jenis_kelamin' => ['required', Rule::in(['Laki-laki', 'Perempuan'])],
             'agama' => 'required|string|max:100',
             'asal_sekolah' => 'required|string|max:255',
             'alamat' => 'required|string',
+
+            // Data Orang Tua (opsional)
             'nama_ayah' => 'nullable|string|max:255',
             'nama_ibu' => 'nullable|string|max:255',
             'pendidikan_terakhir_ayah' => 'nullable|string|max:100',
             'pendidikan_terakhir_ibu' => 'nullable|string|max:100',
             'pekerjaan_ayah' => 'nullable|string|max:100',
             'pekerjaan_ibu' => 'nullable|string|max:100',
+
+            // Dokumen Wajib
             'kk' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'akte' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'foto' => 'required|file|mimes:jpg,jpeg,png|max:2048',
@@ -110,21 +142,54 @@ class PendaftaranController extends Controller
             'bukti_bayar' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
     }
-
-    protected function extractDataFields(array $validatedData): array
-    {
-        return collect($validatedData)->except($this->documentFields)->toArray();
-    }
-
+    
+      /**
+     * Helper untuk mengunggah dokumen menggunakan nama file asli + timestamp.
+     * @param Request $request
+     * @return array
+     */
     protected function uploadDocuments(Request $request): array
     {
         $filePaths = [];
         foreach ($this->documentFields as $field) {
             if ($request->hasFile($field)) {
-                $path = $request->file($field)->store('documents', 'public');
+                $file = $request->file($field);
+                
+                // Mengambil nama asli file dari client
+                $originalName = $file->getClientOriginalName();
+                
+                // Membuat nama file baru: timestamp_nama_asli.ekstensi
+                // Ini membantu mencegah bentrokan nama file, tapi tetap mempertahankan nama asli.
+                $fileNameToStore = time() . '_' . $originalName; 
+                
+                // Menyimpan file menggunakan storeAs
+                $path = $file->storeAs('documents', $fileNameToStore, 'public');
                 $filePaths[$field] = $path;
             }
         }
         return $filePaths;
+    }
+
+    /**
+     * Helper untuk mengambil hanya field yang relevan untuk model Pendaftaran.
+     * @param array $data
+     * @return array
+     */
+    protected function extractDataFields(array $data): array
+    {
+        // Daftar kolom yang ada di tabel Pendaftaran (kecuali id_user dan timestamps)
+        $pendaftaranFields = [
+            'nama_siswa', 'nisn', 'no_telp', 'tempat_tgl_lahir', 'jenis_kelamin', 
+            'agama', 'asal_sekolah', 'alamat', 'nama_ayah', 'nama_ibu', 
+            'pendidikan_terakhir_ayah', 'pendidikan_terakhir_ibu', 'pekerjaan_ayah', 
+            'pekerjaan_ibu'
+        ];
+
+        // Filter data yang divalidasi
+        return array_filter(
+            $data, 
+            fn($key) => in_array($key, $pendaftaranFields), 
+            ARRAY_FILTER_USE_KEY
+        );
     }
 }
