@@ -50,6 +50,6 @@
     </div>
     {{-- Import file JS logout khusus untuk user yang login --}}
     @auth
-        <script src="{{ asset('js/logout.js') }}"></script>
+        @vite('resources/js/logout.js')
     @endauth
 </header>
