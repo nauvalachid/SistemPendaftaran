@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,6 +10,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="font-sans antialiased bg-gray-100">
     <div class="min-h-screen">
 
@@ -17,5 +19,13 @@
             @yield('content')
         </main>
     </div>
+
+    @auth('admin')
+        <script>
+            const BASE_URL = '{{ url('/') }}'; 
+        </script>
+        {{-- Pastikan pendaftaran-status.js hanya dimuat jika admin login --}}
+        @vite(['resources/js/pendaftaran-status.js'])
+    @endauth
 </body>
 </html>

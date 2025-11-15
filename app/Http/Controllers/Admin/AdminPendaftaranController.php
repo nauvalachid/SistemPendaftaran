@@ -127,5 +127,32 @@ class AdminPendaftaranController extends Controller
         return Storage::disk('public')->download($filePath);
     }
 
-    // Fungsi create, store, edit, update, destroy (yang tidak perlu) tidak didefinisikan
+     public function update(Request $request, $id)
+    {
+        // Validasi input
+        $validated = $request->validate([
+            'status' => 'required|in:Pending,Diterima,Ditolak',
+        ]);
+
+        // Ambil data pendaftaran
+        $pendaftaran = Pendaftaran::findOrFail($id);
+
+        // Update status
+        $pendaftaran->status = $validated['status'];
+        $pendaftaran->save();
+
+        // Jika request dari AJAX
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Status pendaftaran berhasil diperbarui',
+                'status' => $pendaftaran->status,
+            ]);
+        }
+
+        // Jika dari form biasa
+        return redirect()
+            ->back()
+            ->with('success', 'Status pendaftaran berhasil diubah menjadi ' . $pendaftaran->status);
+    }
 }

@@ -57,20 +57,20 @@ require __DIR__ . '/auth.php';
 Route::prefix('admin')->name('admin.')->group(function () {
 
     // Rute Guest (Login) untuk Admin
-    Route::middleware('guest:admin')->group(function () {
-        Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])->name('login');
-        Route::post('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'store']);
-    });
+    // Route::middleware('guest:admin')->group(function () {
+    //     Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])->name('login');
+    //     Route::post('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'store']);
+    // });
 
     // Rute Authenticated (Dashboard & Logout) untuk Admin
     Route::middleware('auth:admin')->group(function () {
-        Route::post('/logout', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'destroy'])->name('logout');
+        // Route::post('/logout', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
         // Dashboard Admin
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
 
-        // --- Rute MANAJEMEN PENDAFTARAN OLEH ADMIN ---
+       
 
         // 1. Rute Resource: Index & Show
         Route::resource('pendaftaran', AdminPendaftaranController::class)
@@ -85,7 +85,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/export/pendaftaran', [AdminExportController::class, 'export'])->name('export.pendaftaran');
 
 
-        // ... Tambahkan rute CRUD Admin lainnya di sini
+        Route::post('/pendaftaran/{id}/status', [AdminPendaftaranController::class, 'update'])
+        ->name('pendaftaran.updateStatus');
+
     });
 });
 
