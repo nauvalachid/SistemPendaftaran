@@ -127,6 +127,43 @@ class AdminPendaftaranController extends Controller
         return Storage::disk('public')->download($filePath);
     }
 
+    /**
+     * Approve pendaftaran
+     */
+    public function approve(Pendaftaran $pendaftaran)
+    {
+        // Ubah status menjadi Diterima
+        $pendaftaran->status = 'Diterima';
+        $pendaftaran->save();
+
+        return redirect()
+            ->route('admin.pendaftaran.show', $pendaftaran->id_pendaftaran)
+            ->with('success', 'Pendaftaran berhasil disetujui.');
+    }
+
+    /**
+     * Reject pendaftaran
+     */
+    public function reject(Pendaftaran $pendaftaran, Request $request)
+    {
+        // Validasi alasan penolakan jika dibutuhkan
+        $request->validate([
+            'alasan' => 'nullable|string'
+        ]);
+
+        // Update status
+        $pendaftaran->status = 'Ditolak';
+        
+        // Jika ada kolom alasan, simpan
+        if ($request->filled('alasan')) {
+            $pendaftaran->alasan = $request->alasan;
+        }
+
+        $pendaftaran->save();
+
+        return redirect()
+            ->route('admin.pendaftaran.show', $pendaftaran->id_pendaftaran)
+            ->with('success', 'Pendaftaran berhasil ditolak.');
      public function update(Request $request, $id)
     {
         // Validasi input
