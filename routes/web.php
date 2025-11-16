@@ -2,16 +2,16 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PendaftaranController;
+use App\Http\Controllers\LandingPageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminPendaftaranController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminExportController;
+use App\Http\Controllers\Admin\AdminKontenController;
 use Illuminate\Http\Request;
 use App\Models\Pendaftaran;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [LandingPageController::class, 'index'])->name('home');
 
 Route::get('/dashboard', function () {
     // Cek apakah ada data pendaftaran yang tersimpan di session
@@ -56,40 +56,60 @@ Route::middleware('auth')->group(function () {
 require __DIR__ . '/auth.php';
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    // Rute Guest (Login) untuk Admin
-    // Route::middleware('guest:admin')->group(function () {
-    //     Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])->name('login');
-    //     Route::post('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'store']);
-    // });
-
     // Rute Authenticated (Dashboard & Logout) untuk Admin
     Route::middleware('auth:admin')->group(function () {
-        // Route::post('/logout', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
         // Dashboard Admin
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-
-       
-
-        // 1. Rute Resource: Index & Show
+        // =============================
+        // PENDAFTARAN
+        // =============================
         Route::resource('pendaftaran', AdminPendaftaranController::class)
             ->only(['index', 'show'])
             ->names('pendaftaran');
 
-        // 2. Rute Download Dokumen
-        Route::get('pendaftaran/{pendaftaran}/download/{field}', [AdminPendaftaranController::class, 'download'])
+        Route::get(
+            'pendaftaran/{pendaftaran}/download/{field}',
+            [AdminPendaftaranController::class, 'download']
+        )
             ->name('pendaftaran.download');
 
-        // 3. Rute Export Data Pendaftar
-        Route::get('/export/pendaftaran', [AdminExportController::class, 'export'])->name('export.pendaftaran');
+        Route::get(
+            '/export/pendaftaran',
+            [AdminExportController::class, 'export']
+        )
+            ->name('export.pendaftaran');
 
+        // Note: Penggunaan POST untuk update resource tidak ideal, 
+        // namun dipertahankan sesuai kode yang Anda berikan.
+        Route::post(
+            '/pendaftaran/{id}/status',
+            [AdminPendaftaranController::class, 'update']
+        )
+            ->name('pendaftaran.updateStatus');
 
-        Route::post('/pendaftaran/{id}/status', [AdminPendaftaranController::class, 'update'])
-        ->name('pendaftaran.updateStatus');
+        // ===================================
+        // KONTEN – CRUD LENGKAP (1 Controller)
+        // ===================================
+        
+        // Rute API untuk mengambil data tunggal (JSON)
+        Route::get('/konten/json/{id}', [AdminKontenController::class, 'json'])->name('konten.json');
+        
+        // Halaman admin konten (Blade)
+        Route::get('/konten', [AdminKontenController::class, 'index'])->name('konten.index');
 
+        // Rute Tambahan untuk CRUD Konten Utama (Store, Update, Destroy)
+        Route::post('/konten', [AdminKontenController::class, 'store'])->name('konten.store');
+        Route::put('/konten/{id}', [AdminKontenController::class, 'update'])->name('konten.update');
+        Route::delete('/konten/{id}', [AdminKontenController::class, 'destroy'])->name('konten.destroy');
+
+        // Rute untuk Media Tambahan
+        Route::post('/konten_media', [AdminKontenController::class, 'storeMedia'])->name('konten_media.store');
+        Route::delete('/konten_media/{id}', [AdminKontenController::class, 'destroyMedia'])->name('konten_media.destroy');
     });
 });
+
 
 
 // -------------------------------------------------------------------
