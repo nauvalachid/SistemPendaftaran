@@ -147,7 +147,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->name('pendaftaran.updateStatus');
 
         // Rute Tambahan untuk CRUD Konten Utama (Store, Update, Destroy)
-        Route::post('/konten', [AdminKontenController::class, 'store'])->name('konten.store');
+        Route::get('/konten', [AdminKontenController::class, 'index'])->name('konten.index');
+        Route::post('/konten/create', [AdminKontenController::class, 'store'])->name('konten.store');
         Route::put('/konten/{id}', [AdminKontenController::class, 'update'])->name('konten.update');
         Route::delete('/konten/{id}', [AdminKontenController::class, 'destroy'])->name('konten.destroy');
 

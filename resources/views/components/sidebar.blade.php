@@ -1,4 +1,4 @@
-<aside class="flex h-screen w-64 flex-col overflow-y-auto border-r bg-white px-5 py-8">
+<aside class="flex h-screen w-64 flex-col overflow-y-auto bg-white px-5 py-8">
     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-x-4">
         <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-700">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-7 w-7">
