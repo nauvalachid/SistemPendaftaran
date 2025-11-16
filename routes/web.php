@@ -90,10 +90,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::post('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'store']);
     });
+    // Rute Guest (Login) untuk Admin
+    // Route::middleware('guest:admin')->group(function () {
+    //     Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])->name('login');
+    //     Route::post('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'store']);
+    // });
 
 
     // Authenticated Admin
     Route::middleware('auth:admin')->group(function () {
+        // Route::post('/logout', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
         Route::post('/logout', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
@@ -107,6 +113,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         | CRUD Pendaftaran oleh Admin
         |--------------------------------------------------------------------------
         */
+       
 
         // Index + Show
         Route::resource('pendaftaran', AdminPendaftaranController::class)
@@ -131,6 +138,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Export Excel
         Route::get('/export/pendaftaran', [AdminExportController::class, 'export'])
             ->name('export.pendaftaran');
+        Route::post('/pendaftaran/{id}/status', [AdminPendaftaranController::class, 'update'])
+        ->name('pendaftaran.updateStatus');
+
     });
 });
 

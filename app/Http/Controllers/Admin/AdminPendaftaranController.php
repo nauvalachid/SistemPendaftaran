@@ -164,5 +164,32 @@ class AdminPendaftaranController extends Controller
         return redirect()
             ->route('admin.pendaftaran.show', $pendaftaran->id_pendaftaran)
             ->with('success', 'Pendaftaran berhasil ditolak.');
+     public function update(Request $request, $id)
+    {
+        // Validasi input
+        $validated = $request->validate([
+            'status' => 'required|in:Pending,Diterima,Ditolak',
+        ]);
+
+        // Ambil data pendaftaran
+        $pendaftaran = Pendaftaran::findOrFail($id);
+
+        // Update status
+        $pendaftaran->status = $validated['status'];
+        $pendaftaran->save();
+
+        // Jika request dari AJAX
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Status pendaftaran berhasil diperbarui',
+                'status' => $pendaftaran->status,
+            ]);
+        }
+
+        // Jika dari form biasa
+        return redirect()
+            ->back()
+            ->with('success', 'Status pendaftaran berhasil diubah menjadi ' . $pendaftaran->status);
     }
 }
