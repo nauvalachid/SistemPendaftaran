@@ -50,6 +50,29 @@
                 </svg>
                 <span class="mx-4 text-sm font-medium">Pendaftaran</span>
             </a>
+
+          {{-- Konten Link --}}
+            @php 
+                $isActive = request()->routeIs('admin.konten.index*'); 
+            @endphp
+
+            <a class="flex transform items-center rounded-lg px-3 py-2 transition duration-300
+                @if ($isActive) 
+                    text-indigo-700 bg-indigo-50 font-semibold 
+                @else 
+                    text-gray-500 hover:bg-gray-100 hover:text-gray-700 
+                @endif"
+                href="{{ route('admin.konten.index') }}"
+                @if ($isActive) aria-current="page" @endif>
+
+                {{-- Ikon Pensil / Edit Konten --}}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 18.257V21.75H14.25l10.435-10.435zM16.862 4.487l1.688 1.688M10.582 18.257v-2.652a1.875 1.875 0 011.875-1.875h2.652" />
+                </svg>
+
+                <span class="mx-4 text-sm font-medium">Konten</span>
+            </a>
+
         </nav>
         
         <!-- LOGOUT -->
