@@ -3,7 +3,7 @@
 @section('title', 'Dashboard Admin')
 
 @section('content')
-<div class="flex min-h-screen bg-gray-50">
+<div class="flex min-h-screen bg-white">
     <x-sidebar />
 
     <main class="w-full overflow-y-auto p-8 lg:p-12">
