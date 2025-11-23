@@ -5,6 +5,12 @@
 @section('content')
 <div class="flex min-h-screen bg-white">
 
+    {{-- Sidebar Component --}}
+    <x-sidebar />
+
+    <main class="w-full overflow-y-auto p-6 md:p-12">
+        {{-- Font Awesome CDN --}}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     {{-- Sidebar --}}
     <x-sidebar />
 
@@ -20,11 +26,14 @@
             <p class="mt-1 text-gray-600">Kelola data pendaftar di sini!</p>
         </div>
 
+        {{-- Garis Pemisah --}}
         <hr class="my-5 h-px border-0 bg-gray-200">
 
         {{-- Data Pendaftar --}}
         <div class="mb-6 flex justify-between items-center">
             <h2 class="text-xl font-semibold text-gray-900">Data Pendaftar</h2>
+            
+            {{-- Tombol Ekspor Data --}}
 
             <a href="{{ route('admin.export.pendaftaran') }}"
                class="inline-flex items-center gap-1.5 bg-white hover:bg-gray-100 border-2 border-gray-900
@@ -39,6 +48,7 @@
             </a>
         </div>
 
+        {{-- Filter Bar - FIXED VERSION --}}
         {{-- Filter --}}
         <div class="mb-6 bg-white p-4 rounded-xl shadow-md border border-gray-200">
             <form id="filterForm"
@@ -65,13 +75,23 @@
                                    text-sm flex items-center gap-2 hover:bg-gray-50 transition">
                         <span>Nama</span>
                         <span id="sortNamaArrow" class="text-xs">
-                            @if(request('sort_by') === 'nama_desc') &#x25B2; @else &#x25BC; @endif
+                            @if(request('sort_by') === 'nama_desc') 
+                                &#x25B2; 
+                            @elseif(request('sort_by') === 'nama_asc')
+                                &#x25BC;
+                            @else
+                                &#x25BC;
+                            @endif
                         </span>
                     </button>
                 </div>
 
                 {{-- Filter Status --}}
                 <select name="status"
+                    class="py-2 px-4.5 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm
+                        focus:ring-blue-500 focus:border-blue-500"
+                    onchange="this.form.submit()">
+                    <option value="">Semua Status</option>
                         class="py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm
                                focus:ring-blue-500 focus:border-blue-500"
                         onchange="this.form.submit()">
@@ -91,6 +111,11 @@
                                    text-sm flex items-center gap-2 hover:bg-gray-50 transition">
                         <span>Tanggal Daftar</span>
                         <span id="sortTanggalArrow" class="text-xs">
+                            @if(request('sort_by') === 'tanggal_asc') 
+                                &#x25B2;
+                            @else
+                                &#x25BC;
+                            @endif
                             @if(request('sort_by') === 'tanggal_asc') &#x25B2; @else &#x25BC; @endif
                         </span>
                     </button>
@@ -98,6 +123,10 @@
 
                 {{-- Filter Asal Sekolah --}}
                 <select name="asal_sekolah"
+                   class="py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm 
+                        focus:ring-blue-500 focus:border-blue-500"
+                    onchange="this.form.submit()">
+                    <option value="">Semua Sekolah</option>
                         class="py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm
                                focus:ring-blue-500 focus:border-blue-500"
                         onchange="this.form.submit()">
@@ -110,6 +139,8 @@
                     @endforeach
                 </select>
 
+                {{-- Hidden input untuk sort_by - PENTING: Di dalam form --}}
+                <input type="hidden" name="sort_by" id="hiddenSortBy" value="{{ request('sort_by', '') }}">
                 {{-- Hidden Sort --}}
                 <input type="hidden" name="sort_by" id="sort_by_input" value="{{ request('sort_by') }}">
 
@@ -137,6 +168,15 @@
                         @forelse ($pendaftarans as $p)
                         <tr class="hover:bg-gray-50 transition">
 
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
+                                {{ $p->nama_siswa }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                {{ $p->nisn ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                {{ $p->asal_sekolah }}
+                            </td>
                             {{-- Nama --}}
                             <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
                                 {{ $p->nama_siswa }}
@@ -190,6 +230,22 @@
                                         $isPending = strtolower($p->status) === 'pending';
                                         $isDisabled = !$isPending;
                                         $setujuClass = $isPending ? 'bg-teal-500 hover:bg-teal-600' : 'bg-gray-300 cursor-not-allowed';
+                                        $tolakClass = $isPending ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-300 cursor-not-allowed';
+                                    @endphp
+                                    
+                                    {{-- Tombol Setuju --}}
+                                    <button
+                                        class="setuju-btn inline-flex items-center text-white text-xs font-medium px-4 py-2 rounded-lg transition {{ $setujuClass }}"
+                                        onclick="handleAction(this, '{{ route('admin.pendaftaran.approve', $p->id_pendaftaran) }}', 'setuju', {{ $p->id_pendaftaran }})"
+                                        {{ $isDisabled ? 'disabled' : '' }}>
+                                        Setuju
+                                    </button>
+
+                                    {{-- Tombol Tolak --}}
+                                    <button
+                                        class="tolak-btn inline-flex items-center text-white text-xs font-medium px-4 py-2 rounded-lg transition {{ $tolakClass }}"
+                                        onclick="handleAction(this, '{{ route('admin.pendaftaran.reject', $p->id_pendaftaran) }}', 'tolak', {{ $p->id_pendaftaran }})"
+                                        {{ $isDisabled ? 'disabled' : '' }}>
                                         $tolakClass  = $isPending ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-300 cursor-not-allowed';
 
                                         if (strtolower($p->status) === 'diterima' || strtolower($p->status) === 'ditolak') {
@@ -251,6 +307,119 @@
 
     </main>
 
+</div>
+
+<script>
+// ========================================
+// FIXED: Logika Sorting & Filter
+// ========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('filterForm');
+    const hiddenSortBy = document.getElementById('hiddenSortBy');
+    const currentSort = '{{ request("sort_by", "") }}';
+
+    // ===== 1. SORT NAMA =====
+    const toggleSortNamaBtn = document.getElementById('toggleSortNama');
+    const sortNamaArrow = document.getElementById('sortNamaArrow');
+    
+    toggleSortNamaBtn.addEventListener('click', () => {
+        let newSort = 'nama_asc'; // Default: A-Z
+        
+        if (currentSort === 'nama_asc') {
+            newSort = 'nama_desc'; // Toggle ke Z-A
+        }
+        
+        // Update hidden input dan submit
+        hiddenSortBy.value = newSort;
+        form.submit();
+    });
+
+    // ===== 2. SORT TANGGAL =====
+    const toggleSortTanggalBtn = document.getElementById('toggleSortTanggal');
+    const sortTanggalArrow = document.getElementById('sortTanggalArrow');
+    
+    toggleSortTanggalBtn.addEventListener('click', () => {
+        let newSort = 'tanggal_desc'; // Default: Terbaru
+        
+        if (currentSort === 'tanggal_desc') {
+            newSort = 'tanggal_asc'; // Toggle ke Terlama
+        }
+        
+        // Update hidden input dan submit
+        hiddenSortBy.value = newSort;
+        form.submit();
+    });
+
+    // ===== 3. CLEAR SORT ketika filter lain diubah =====
+    // Opsional: Reset sort ke default ketika user mengubah filter lain
+    const filterInputs = form.querySelectorAll('input[name="search"], select[name="status"], select[name="asal_sekolah"]');
+    
+    filterInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            // Biarkan sort tetap ada, tidak di-reset
+            // Jika ingin reset sort saat filter berubah, uncomment baris berikut:
+            // hiddenSortBy.value = '';
+        });
+    });
+});
+
+// ========================================
+// Logika Approve/Reject dengan AJAX
+// ========================================
+
+function handleAction(btn, url, actionType, idPendaftaran) {
+    if (btn.disabled) return;
+
+    const actionLabel = actionType === 'setuju' ? 'Menerima' : 'Menolak';
+
+    // Konfirmasi dari user
+    const confirmation = window.confirm(`Anda yakin ingin ${actionLabel} pendaftar ini?`);
+    if (!confirmation) return;
+
+    // Disable button dan tampilkan loading
+    btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Proses...`;
+
+    // Kirim request AJAX
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.message || `HTTP error: ${response.status}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Reload halaman untuk update tampilan
+            window.location.reload();
+        } else {
+            alert('Aksi gagal: ' + (data.message || 'Unknown Error'));
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan: ' + error.message);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+}
+</script>
+
+@endsection
     {{-- SCRIPT --}}
     <script>
         document.addEventListener('DOMContentLoaded', () => {

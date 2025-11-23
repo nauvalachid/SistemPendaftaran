@@ -18,10 +18,13 @@ use App\Models\Pendaftaran;
 
 /*
 |--------------------------------------------------------------------------
-| Halaman Utama
+| Halaman Utama (Landing Page)
 |--------------------------------------------------------------------------
+| Route ini mengarah ke Controller untuk mengambil data dari database
+| sebelum menampilkannya di view 'welcome'.
 */
 Route::get('/', [LandingPageController::class, 'index'])->name('home');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +53,6 @@ Route::get('/dashboard', function () {
 
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
-
 
 
 /*
@@ -86,6 +88,13 @@ require __DIR__ . '/auth.php';
 */
 Route::prefix('admin')->name('admin.')->group(function () {
 
+    // Guest (Login Admin)
+    Route::middleware('guest:admin')->group(function () {
+        Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])
+            ->name('login');
+
+        Route::post('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'store']);
+    });
     // // Guest (Login)
     // Route::middleware('guest:admin')->group(function () {
     //     Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])
@@ -115,7 +124,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         | CRUD Pendaftaran oleh Admin
         |--------------------------------------------------------------------------
         */
-       
 
         // Index + Show
         Route::resource('pendaftaran', AdminPendaftaranController::class)
@@ -140,10 +148,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Export Excel
         Route::get('/export/pendaftaran', [AdminExportController::class, 'export'])
             ->name('export.pendaftaran');
+            
         Route::post('/pendaftaran/{id}/status', [AdminPendaftaranController::class, 'update'])
-        ->name('pendaftaran.updateStatus');
+            ->name('pendaftaran.updateStatus');
 
-        // Rute Tambahan untuk CRUD Konten Utama (Store, Update, Destroy)
+        /*
+        |--------------------------------------------------------------------------
+        | CRUD Konten Website (CMS)
+        |--------------------------------------------------------------------------
+        */
+        // Rute untuk Konten Utama (Store, Update, Destroy)
         Route::get('/konten', [AdminKontenController::class, 'index'])->name('konten.index');
         Route::post('/konten/create', [AdminKontenController::class, 'store'])->name('konten.store');
         Route::put('/konten/{id}', [AdminKontenController::class, 'update'])->name('konten.update');
@@ -154,7 +168,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('/konten_media/{id}', [AdminKontenController::class, 'destroyMedia'])->name('konten_media.destroy');
     });
 });
-
 
 
 /*
