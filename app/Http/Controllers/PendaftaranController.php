@@ -17,6 +17,48 @@ class PendaftaranController extends Controller
      */
     protected array $documentFields = ['kk', 'akte', 'foto', 'ijazah_sk', 'bukti_bayar'];
 
+    // app/Http/Controllers/PendaftaranController.php
+
+    public function index(Request $request)
+    {
+        // Cek apakah pengguna sudah login (untuk otorisasi rute, jika perlu)
+        // Walaupun user login, kita TIDAK akan menampilkan status mereka secara default.
+
+        $searchTerm = $request->input('search');
+        $pendaftaran_search = null;
+
+        if ($searchTerm) {
+            // HANYA cari berdasarkan nama_siswa menggunakan LIKE
+            // Ambil satu hasil yang paling cocok/pertama ditemukan.
+            $pendaftaran_search = Pendaftaran::where('nama_siswa', 'like', '%' . $searchTerm . '%')->first();
+
+            // JIKA PENDAFTARAN DITEMUKAN:
+            // Kembalikan view status dengan data hasil pencarian
+            return view('pendaftaran.status', [
+                'pendaftaran_search' => $pendaftaran_search,
+                'searchTerm' => $searchTerm
+            ]);
+        }
+
+        // JIKA TIDAK ADA PENCARIAN (Akses Awal ke /pendaftaran)
+        // Cek status login hanya untuk menentukan apakah harus diarahkan ke formulir
+        if (Auth::check()) {
+            $pendaftaran_user = Pendaftaran::where('id_user', Auth::id())->first();
+
+            if ($pendaftaran_user) {
+                // Jika user sudah login dan mendaftar: Arahkan mereka ke halaman status
+                // dan biarkan mereka mencari. (Alternatif: arahkan ke dashboard/menu)
+                // Untuk skenario ini, kita biarkan mereka di halaman status dengan hasil NULL.
+            } else {
+                // Jika user login tapi belum mendaftar, arahkan ke formulir.
+                return redirect()->route('pendaftaran.create');
+            }
+        }
+
+        // Default: Tampilkan halaman status (hanya search bar dan cards)
+        return view('pendaftaran.status', compact('pendaftaran_search', 'searchTerm'));
+    }
+
     /**
      * Menampilkan formulir pendaftaran untuk publik.
      */
@@ -67,21 +109,21 @@ class PendaftaranController extends Controller
                 $this->extractDataFields($validatedData),
                 $filePaths
             ));
-            
+
             // Arahkan ke halaman detail pendaftaran dengan pesan sukses.
             return redirect()->route('pendaftaran.create')
                 ->with('success', 'Pendaftaran berhasil dikirim! Silahkan cek status pendaftaran Anda.');
-        } 
-        
+        }
+
         // KONDISI B: Jika pengguna adalah PENGUNJUNG (BELUM LOGIN)
         else {
             // Langkah 2: Upload file terlebih dahulu dan dapatkan path-nya.
             // Catatan: Pastikan logika uploadDocuments Anda menyimpan file secara sementara atau permanen.
             $filePaths = $this->uploadDocuments($request);
-            
+
             // Langkah 3: Gabungkan data teks dan path file yang sudah di-upload.
             $allData = array_merge($this->extractDataFields($validatedData), $filePaths);
-            
+
             // Langkah 4: Simpan semua data yang sudah matang ini ke dalam session.
             session(['pending_pendaftaran' => $allData]);
 
@@ -116,11 +158,11 @@ class PendaftaranController extends Controller
             'nama_siswa' => 'required|string|max:255',
             'nisn' => 'nullable|string|max:10',
             'no_telp' => 'nullable|string|max:15',
-            
+
             // Kolom input terpisah
-            'tempat_lahir' => 'required|string|max:100', 
-            'tanggal_lahir' => 'required|date', 
-            
+            'tempat_lahir' => 'required|string|max:100',
+            'tanggal_lahir' => 'required|date',
+
             'jenis_kelamin' => ['required', Rule::in(['Laki-laki', 'Perempuan'])],
             'agama' => 'required|string|max:100',
             'asal_sekolah' => 'required|string|max:255',
@@ -142,8 +184,8 @@ class PendaftaranController extends Controller
             'bukti_bayar' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
     }
-    
-      /**
+
+    /**
      * Helper untuk mengunggah dokumen menggunakan nama file asli + timestamp.
      * @param Request $request
      * @return array
@@ -154,14 +196,14 @@ class PendaftaranController extends Controller
         foreach ($this->documentFields as $field) {
             if ($request->hasFile($field)) {
                 $file = $request->file($field);
-                
+
                 // Mengambil nama asli file dari client
                 $originalName = $file->getClientOriginalName();
-                
+
                 // Membuat nama file baru: timestamp_nama_asli.ekstensi
                 // Ini membantu mencegah bentrokan nama file, tapi tetap mempertahankan nama asli.
-                $fileNameToStore = time() . '_' . $originalName; 
-                
+                $fileNameToStore = time() . '_' . $originalName;
+
                 // Menyimpan file menggunakan storeAs
                 $path = $file->storeAs('documents', $fileNameToStore, 'public');
                 $filePaths[$field] = $path;
@@ -179,16 +221,26 @@ class PendaftaranController extends Controller
     {
         // Daftar kolom yang ada di tabel Pendaftaran (kecuali id_user dan timestamps)
         $pendaftaranFields = [
-            'nama_siswa', 'nisn', 'no_telp', 'tempat_tgl_lahir', 'jenis_kelamin', 
-            'agama', 'asal_sekolah', 'alamat', 'nama_ayah', 'nama_ibu', 
-            'pendidikan_terakhir_ayah', 'pendidikan_terakhir_ibu', 'pekerjaan_ayah', 
+            'nama_siswa',
+            'nisn',
+            'no_telp',
+            'tempat_tgl_lahir',
+            'jenis_kelamin',
+            'agama',
+            'asal_sekolah',
+            'alamat',
+            'nama_ayah',
+            'nama_ibu',
+            'pendidikan_terakhir_ayah',
+            'pendidikan_terakhir_ibu',
+            'pekerjaan_ayah',
             'pekerjaan_ibu'
         ];
 
         // Filter data yang divalidasi
         return array_filter(
-            $data, 
-            fn($key) => in_array($key, $pendaftaranFields), 
+            $data,
+            fn($key) => in_array($key, $pendaftaranFields),
             ARRAY_FILTER_USE_KEY
         );
     }

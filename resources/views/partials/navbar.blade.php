@@ -8,12 +8,13 @@
 
     {{-- Menu Links --}}
     <nav class="hidden md:flex items-center space-x-8 text-primaryblue font-semilight">
-        <a href="#beranda" class="hover:text-hover hover:font-bold transition-all duration-200">Beranda</a>
+        <a href="{{ route('home') }}" class="hover:text-hover hover:font-bold transition-all duration-200">Beranda</a>
+
         <a href="#tentang-kami" class="hover:text-hover hover:font-bold transition-all duration-200">Tentang Kami</a>
         <a href="#" class="hover:text-hover hover:font-bold transition-all duration-200">Ekstrakurikuler</a>
         <a href="#" class="hover:text-hover hover:font-bold transition-all duration-200">Tenaga Pengajar</a>
 
-        <a href="{{ route('pendaftaran.create') }}"
+        <a href="{{ route('pendaftaran.index') }}"
             class="flex items-center hover:text-hover hover:font-bold transition-all duration-200">
             Pendaftaran
             <svg class="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"

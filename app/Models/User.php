@@ -46,4 +46,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function pendaftaran()
+    {
+        // Sesuaikan relasi Anda (bisa hasOne atau hasMany tergantung kebutuhan)
+        return $this->hasOne(Pendaftaran::class);
+    }
 }

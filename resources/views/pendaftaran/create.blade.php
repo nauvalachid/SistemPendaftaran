@@ -9,20 +9,27 @@
                 <p class="mt-2 text-md text-gray-500">SD Muhammadiyah 2 Ambarketawang - Tahun Pelajaran 2025/2026</p>
             </div>
 
-            {{-- Notifikasi --}}
+            {{-- Notifikasi (Dibiarkan sama) --}}
             @if(session('success') || session('error') || session('info') || $errors->any())
                 <div class="border px-4 py-3 rounded-lg relative mb-8 max-w-2xl mx-auto text-sm @if(session('success')) bg-green-100 border-green-400 text-green-700 @elseif(session('error') || $errors->any()) bg-red-100 border-red-400 text-red-700 @else bg-blue-100 border-blue-400 text-blue-700 @endif"
-                    role="alert">
+                    role="alert" id="laravel-validation-alert">
                     <strong class="font-bold">@if(session('success')) Berhasil! @elseif(session('error') || $errors->any())
                     Error! @else Perhatian! @endif</strong>
                     <span class="block sm:inline ml-2">@if(session('success')) {{ session('success') }}
                     @elseif(session('error')) {{ session('error') }} @elseif(session('info')) {{ session('info') }}
-                        @else Terdapat kesalahan validasi. @endif</span>
+                    @else Terdapat kesalahan validasi. @endif</span>
                     @if($errors->any())
                         <ul class="mt-2 list-disc list-inside">@foreach ($errors->all() as $error)<li>{{ $error }}</li>
                     @endforeach</ul>@endif
                 </div>
             @endif
+            
+            {{-- Alert Validasi Kosong (Client Side) --}}
+            <div id="client-validation-alert" class="hidden border border-yellow-400 bg-yellow-100 text-yellow-700 px-4 py-3 rounded-lg relative mb-8 max-w-2xl mx-auto text-sm" role="alert">
+                <strong class="font-bold">Perhatian!</strong>
+                <span class="block sm:inline ml-2">Mohon isi semua bidang yang wajib diisi.</span>
+            </div>
+
 
             {{-- KARTU FORMULIR --}}
             <div class="bg-white overflow-hidden rounded-2xl shadow-lg border border-gray-200/80">
@@ -37,20 +44,25 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 
                                 <div class="md:col-span-2">
-                                    <label for="nama_siswa" class="block text-sm font-semibold text-gray-700 mb-1">Nama
-                                        Lengkap *</label>
+                                    {{-- (Wajib) DIHAPUS --}}
+                                    <label for="nama_siswa" class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Nama Lengkap
+                                    </label>
                                     <input type="text" name="nama_siswa" id="nama_siswa" value="{{ old('nama_siswa') }}"
                                         required class="form-input" placeholder="Masukkan nama lengkap">
                                     @error('nama_siswa') <p class="error-message">{{ $message }}</p> @enderror
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Jenis Kelamin
-                                        *</label>
+                                    {{-- (Wajib) DIHAPUS --}}
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Jenis Kelamin
+                                    </label>
                                     <div class="custom-select-container" id="jenisKelaminDropdown">
                                         <input type="hidden" name="jenis_kelamin" id="jenis_kelamin_value"
-                                            value="{{ old('jenis_kelamin') }}">
-                                        <div class="custom-select-trigger" tabindex="0">
+                                            value="{{ old('jenis_kelamin') }}" required>
+                                        {{-- KELAS form-input DIBIARKAN AGAR STYLING KONSISTEN --}}
+                                        <div class="custom-select-trigger form-input" tabindex="0"> 
                                             <span id="jenisKelaminText"
                                                 class="{{ old('jenis_kelamin') ? 'text-gray-800' : 'text-gray-400' }}">
                                                 {{ old('jenis_kelamin') ? old('jenis_kelamin') : 'Pilih Jenis Kelamin' }}
@@ -71,8 +83,11 @@
                                 </div>
 
                                 <div>
+                                    {{-- (Wajib) DIHAPUS --}}
                                     <label for="tempat_lahir"
-                                        class="block text-sm font-semibold text-gray-700 mb-1">Tempat Lahir *</label>
+                                        class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Tempat Lahir
+                                    </label>
                                     <input type="text" name="tempat_lahir" id="tempat_lahir"
                                         value="{{ old('tempat_lahir') }}" required class="form-input"
                                         placeholder="Contoh: Yogyakarta">
@@ -80,16 +95,21 @@
                                 </div>
 
                                 <div>
+                                    {{-- (Wajib) DIHAPUS --}}
                                     <label for="tanggal_lahir"
-                                        class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Lahir *</label>
+                                        class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Tanggal Lahir
+                                    </label>
                                     <input type="date" name="tanggal_lahir" id="tanggal_lahir"
                                         value="{{ old('tanggal_lahir') }}" required class="form-input">
                                     @error('tanggal_lahir') <p class="error-message">{{ $message }}</p> @enderror
                                 </div>
 
                                 <div>
-                                    <label for="agama" class="block text-sm font-semibold text-gray-700 mb-1">Agama
-                                        *</label>
+                                    {{-- (Wajib) DIHAPUS --}}
+                                    <label for="agama" class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Agama
+                                    </label>
                                     <input type="text" name="agama" id="agama" value="{{ old('agama', 'Islam') }}"
                                         required class="form-input">
                                     @error('agama') <p class="error-message">{{ $message }}</p> @enderror
@@ -105,8 +125,10 @@
                                 </div>
 
                                 <div class="md:col-span-2">
-                                    <label for="alamat" class="block text-sm font-semibold text-gray-700 mb-1">Alamat
-                                        Lengkap *</label>
+                                    {{-- (Wajib) DIHAPUS --}}
+                                    <label for="alamat" class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Alamat Lengkap
+                                    </label>
                                     <textarea name="alamat" id="alamat" rows="4" required class="form-input"
                                         placeholder="RT, RW, Dusun, Kelurahan/Desa, Kecamatan, Kabupaten/Kota, Provinsi.">{{ old('alamat') }}</textarea>
                                     @error('alamat') <p class="error-message">{{ $message }}</p> @enderror
@@ -119,52 +141,66 @@
                             <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-4">Data Orang Tua Siswa/i</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                 <div>
-                                    <label for="nama_ayah" class="block text-sm font-semibold text-gray-700 mb-1">Nama
-                                        Ayah</label>
+                                    {{-- (Wajib) DIHAPUS --}}
+                                    <label for="nama_ayah" class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Nama Ayah
+                                    </label>
                                     <input type="text" name="nama_ayah" id="nama_ayah" value="{{ old('nama_ayah') }}"
-                                        class="form-input" placeholder="Nama lengkap Ayah">
+                                        required class="form-input" placeholder="Nama lengkap Ayah"> 
                                     @error('nama_ayah') <p class="error-message">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
-                                    <label for="nama_ibu" class="block text-sm font-semibold text-gray-700 mb-1">Nama
-                                        Ibu</label>
+                                    {{-- (Wajib) DIHAPUS --}}
+                                    <label for="nama_ibu" class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Nama Ibu
+                                    </label>
                                     <input type="text" name="nama_ibu" id="nama_ibu" value="{{ old('nama_ibu') }}"
-                                        class="form-input" placeholder="Nama lengkap Ibu">
+                                        required class="form-input" placeholder="Nama lengkap Ibu">
                                     @error('nama_ibu') <p class="error-message">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
+                                    {{-- (Wajib) DIHAPUS --}}
                                     <label for="pendidikan_terakhir_ayah"
-                                        class="block text-sm font-semibold text-gray-700 mb-1">Pendidikan Terakhir
-                                        Ayah</label>
+                                        class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Pendidikan Terakhir Ayah
+                                    </label>
                                     <input type="text" name="pendidikan_terakhir_ayah" id="pendidikan_terakhir_ayah"
-                                        value="{{ old('pendidikan_terakhir_ayah') }}" class="form-input"
+                                        value="{{ old('pendidikan_terakhir_ayah') }}" required class="form-input"
                                         placeholder="Contoh: S1">
                                     @error('pendidikan_terakhir_ayah') <p class="error-message">{{ $message }}</p>
                                     @enderror
                                 </div>
                                 <div>
+                                    {{-- (Wajib) DIHAPUS --}}
                                     <label for="pendidikan_terakhir_ibu"
-                                        class="block text-sm font-semibold text-gray-700 mb-1">Pendidikan Terakhir
-                                        Ibu</label>
+                                        class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Pendidikan Terakhir Ibu
+                                    </label>
                                     <input type="text" name="pendidikan_terakhir_ibu" id="pendidikan_terakhir_ibu"
-                                        value="{{ old('pendidikan_terakhir_ibu') }}" class="form-input"
+                                        value="{{ old('pendidikan_terakhir_ibu') }}" required class="form-input"
                                         placeholder="Contoh: SMA">
                                     @error('pendidikan_terakhir_ibu') <p class="error-message">{{ $message }}</p>
                                     @enderror
                                 </div>
                                 <div>
+                                    {{-- (Wajib) DIHAPUS --}}
                                     <label for="pekerjaan_ayah"
-                                        class="block text-sm font-semibold text-gray-700 mb-1">Pekerjaan Ayah</label>
+                                        class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Pekerjaan Ayah
+                                    </label>
                                     <input type="text" name="pekerjaan_ayah" id="pekerjaan_ayah"
-                                        value="{{ old('pekerjaan_ayah') }}" class="form-input"
+                                        value="{{ old('pekerjaan_ayah') }}" required class="form-input"
                                         placeholder="Contoh: Karyawan Swasta">
                                     @error('pekerjaan_ayah') <p class="error-message">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
+                                    {{-- (Wajib) DIHAPUS --}}
                                     <label for="pekerjaan_ibu"
-                                        class="block text-sm font-semibold text-gray-700 mb-1">Pekerjaan Ibu</label>
+                                        class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Pekerjaan Ibu
+                                    </label>
                                     <input type="text" name="pekerjaan_ibu" id="pekerjaan_ibu"
-                                        value="{{ old('pekerjaan_ibu') }}" class="form-input"
+                                        value="{{ old('pekerjaan_ibu') }}" required class="form-input"
                                         placeholder="Contoh: Ibu Rumah Tangga">
                                     @error('pekerjaan_ibu') <p class="error-message">{{ $message }}</p> @enderror
                                 </div>
@@ -178,34 +214,42 @@
                             <div class="mb-6">
                                 <p class="font-bold text-gray-800 mb-2">Ketentuan upload dokumen :</p>
                                 <ol class="list-decimal list-inside text-sm text-gray-700 space-y-1">
-                                    <li>Format PDF, JPG, JPEG, PNG</li>
+                                    <li>Format **PDF, JPG, JPEG, PNG**</li>
                                     <li>Gambar harus jelas dan terbaca,</li>
-                                    <li>Ukuran maksimal 10MB per-file</li>
+                                    <li>Ukuran maksimal **10MB** per-file</li>
                                 </ol>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                 <div>
-                                    <label for="kk" class="block text-sm font-semibold text-gray-700 mb-1">Kartu
-                                        Keluarga (KK) *</label>
+                                    {{-- (Wajib) DIHAPUS --}}
+                                    <label for="kk" class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Kartu Keluarga (KK)
+                                    </label>
                                     <input type="file" name="kk" id="kk" required class="form-file-input">
                                     @error('kk') <p class="error-message">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
-                                    <label for="akte" class="block text-sm font-semibold text-gray-700 mb-1">Akte
-                                        Kelahiran *</label>
+                                    {{-- (Wajib) DIHAPUS --}}
+                                    <label for="akte" class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Akte Kelahiran
+                                    </label>
                                     <input type="file" name="akte" id="akte" required class="form-file-input">
                                     @error('akte') <p class="error-message">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
-                                    <label for="foto" class="block text-sm font-semibold text-gray-700 mb-1">Pas Foto
-                                        *</label>
+                                    {{-- (Wajib) DIHAPUS --}}
+                                    <label for="foto" class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Pas Foto
+                                    </label>
                                     <input type="file" name="foto" id="foto" required class="form-file-input">
                                     @error('foto') <p class="error-message">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
+                                    {{-- (Wajib) DIHAPUS --}}
                                     <label for="ijazah_sk"
-                                        class="block text-sm font-semibold text-gray-700 mb-1">Ijazah/SKL Terakhir
-                                        *</label>
+                                        class="block text-sm font-semibold text-gray-700 mb-1">
+                                        Ijazah/SKL Terakhir
+                                    </label>
                                     <input type="file" name="ijazah_sk" id="ijazah_sk" required class="form-file-input">
                                     @error('ijazah_sk') <p class="error-message">{{ $message }}</p> @enderror
                                 </div>
@@ -241,7 +285,7 @@
 
     <script>
         // ===================================
-        // SCRIPT UNTUK MULTI-STEP FORM
+        // SCRIPT UNTUK MULTI-STEP FORM & VALIDASI
         // ===================================
         let currentStep = 1;
         const totalSteps = 3;
@@ -249,6 +293,8 @@
         const prevPlaceholder = document.getElementById('prev-placeholder');
         const nextBtn = document.getElementById('next-btn');
         const submitBtn = document.getElementById('submit-btn');
+        const validationAlert = document.getElementById('client-validation-alert');
+        const laravelAlert = document.getElementById('laravel-validation-alert'); // Ambil alert Laravel
 
         function showStep(stepNumber) {
             document.querySelectorAll('.step-content').forEach(step => step.classList.add('hidden'));
@@ -258,6 +304,9 @@
         }
 
         function updateNavigation(stepNumber) {
+            // Sembunyikan alert validasi klien saat pindah langkah
+            validationAlert.classList.add('hidden');
+
             prevBtn.classList.toggle('hidden', stepNumber === 1);
             prevPlaceholder.classList.toggle('hidden', stepNumber > 1);
             nextBtn.classList.toggle('hidden', stepNumber === totalSteps);
@@ -270,21 +319,89 @@
             }
         }
 
-        function nextStep() { if (currentStep < totalSteps) showStep(++currentStep); }
-        function prevStep() { if (currentStep > 1) showStep(--currentStep); }
+        /**
+         * Melakukan validasi client-side untuk langkah saat ini.
+         * Hanya memeriksa field yang memiliki atribut 'required'.
+         */
+        function validateStep(stepNumber) {
+            const currentStepElement = document.getElementById('step-' + stepNumber);
+            let isValid = true;
+            
+            // Cari semua input, textarea, dan select/hidden input yang required
+            const requiredFields = currentStepElement.querySelectorAll('input[required], textarea[required]');
+
+            requiredFields.forEach(field => {
+                // Hapus styling error sebelumnya (untuk kasus user sudah edit)
+                field.classList.remove('border-red-500', 'shadow-red-500/50'); // HAPUS SHADOW SEBELUMNYA
+                
+                if (!field.value || field.value.trim() === '') {
+                    isValid = false;
+                    // MENAMBAHKAN CLASS shadow-red-500/50 untuk shadow merah.
+                    field.classList.add('border-red-500', 'shadow-red-500/50'); 
+                    // Fokus hanya pada error pertama yang ditemukan
+                    if (!currentStepElement.querySelector('.border-red-500:focus')) field.focus(); 
+                } 
+            });
+
+            // Logika khusus untuk dropdown kustom (jenis_kelamin)
+            if (stepNumber === 1) {
+                const jkValue = document.getElementById('jenis_kelamin_value');
+                const jkTrigger = document.getElementById('jenisKelaminDropdown').querySelector('.custom-select-trigger');
+                
+                // Hapus styling error sebelumnya
+                jkTrigger.classList.remove('border-red-500', 'shadow-red-500/50');
+
+                if (!jkValue.value || jkValue.value.trim() === '') {
+                    isValid = false;
+                    // MENAMBAHKAN CLASS shadow-red-500/50 untuk shadow merah.
+                    jkTrigger.classList.add('border-red-500', 'shadow-red-500/50');
+                    if (!currentStepElement.querySelector('.border-red-500:focus')) jkTrigger.focus();
+                }
+            }
+
+            return isValid;
+        }
+
+
+        function nextStep() { 
+            // Validasi sebelum pindah langkah
+            if (validateStep(currentStep)) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    showStep(currentStep);
+                    validationAlert.classList.add('hidden');
+                }
+            } else {
+                // Tampilkan alert validasi jika gagal
+                validationAlert.classList.remove('hidden');
+                // Gulir ke atas untuk melihat pesan error
+                document.getElementById('client-validation-alert').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        function prevStep() { 
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep); 
+            }
+        }
 
         // Inisialisasi awal
         document.addEventListener('DOMContentLoaded', () => {
-            const errorField = document.querySelector('.error-message');
-            if (errorField) {
-                const parentStep = errorField.closest('.step-content');
-                if (parentStep) currentStep = parseInt(parentStep.id.split('-')[1]);
+            // Cek apakah ada error validasi dari Laravel (setelah submit gagal)
+            if (laravelAlert) {
+                const errorField = document.querySelector('.error-message');
+                if (errorField) {
+                    // Cari parent step dari field yang error
+                    const parentStep = errorField.closest('.step-content');
+                    if (parentStep) currentStep = parseInt(parentStep.id.split('-')[1]);
+                }
             }
             showStep(currentStep);
         });
 
         // ===================================
-        // SCRIPT UNTUK DROPDOWN KUSTOM
+        // SCRIPT UNTUK DROPDOWN KUSTOM 
         // ===================================
         document.addEventListener('DOMContentLoaded', function () {
             const dropdown = document.getElementById('jenisKelaminDropdown');
@@ -314,7 +431,9 @@
                     const selectedValue = option.getAttribute('data-value');
                     hiddenInput.value = selectedValue;
                     displayText.textContent = selectedValue;
-                    displayText.className = 'text-gray-800'; // Hapus class warna placeholder
+                    displayText.className = 'text-gray-800'; 
+                    // Hapus styling error setelah memilih
+                    trigger.classList.remove('border-red-500', 'shadow-red-500/50'); 
                     optionsContainer.classList.add('hidden');
                     trigger.classList.remove('open');
                 });
