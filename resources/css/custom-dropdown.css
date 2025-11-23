@@ -1,0 +1,87 @@
+/* resources/css/custom-dropdown.css */
+
+/* =================================== */
+/* STYLING DROPDOWN KUSTOM             */
+/* =================================== */
+.custom-select-container {
+    position: relative;
+    min-width: 180px;
+}
+
+.custom-select-trigger {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border: 1px solid #d1d5db; /* border-gray-300 */
+    border-radius: 0.5rem;     /* rounded-lg */
+    background-color: white;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: all 0.2s ease-in-out;
+    font-size: 0.875rem;       /* text-sm */
+    color: #374151;            /* text-gray-700 */
+}
+
+.custom-select-trigger:hover {
+    border-color: #3b82f6;     /* border-blue-500 */
+}
+
+.custom-select-trigger .arrow {
+    transition: transform 0.2s ease-in-out;
+    font-size: 0.75rem;
+    color: #9ca3af;            /* text-gray-400 */
+}
+
+.custom-select-container.open .custom-select-trigger .arrow {
+    transform: rotate(180deg);
+}
+
+.custom-select-options {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #e5e7eb; /* border-gray-200 */
+    border-radius: 0.75rem !important;
+    margin-top: 0.25rem;
+    z-index: 50;
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
+    padding: 0.25rem;
+}
+
+.custom-select-container.open .custom-select-options {
+    display: block;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.custom-select-option {
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.custom-select-option:hover {
+    background-color: #f3f4f6; /* bg-gray-100 */
+    color: #111827;            /* text-gray-900 */
+}
+
+.custom-select-option.selected {
+    background-color: #eff6ff; /* bg-blue-50 */
+    color: #2563eb;            /* text-blue-600 */
+    font-weight: 600;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}

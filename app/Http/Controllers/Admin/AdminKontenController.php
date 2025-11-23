@@ -32,12 +32,18 @@ class AdminKontenController extends Controller
      */
     public function json($id)
     {
+        // Pastikan relasi 'kategori' dimuat!
         $konten = Konten::with(['kategori', 'media', 'list'])->findOrFail($id);
         
-        // Ambil media utama (urutan 0)
         $media_utama = $konten->media->where('urutan', 0)->first();
         
         $response = $konten->toArray();
+        
+        // TAMBAHAN PENTING: 
+        // Kadang toArray() tidak menyertakan relasi jika modelnya hidden. 
+        // Kita paksa masukkan nama kategorinya.
+        $response['kategori_nama'] = $konten->kategori ? $konten->kategori->nama : ''; 
+        
         $response['file_utama_url'] = $media_utama ? asset('storage/' . $media_utama->file_path) : null;
 
         return response()->json($response);

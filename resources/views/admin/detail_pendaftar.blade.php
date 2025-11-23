@@ -3,12 +3,24 @@
 @section('title', 'Detail Pendaftaran Siswa')
 
 @section('content')
+    
+    {{-- Panggil CSS Scrollbar dari file terpisah --}}
+    @vite(['resources/css/style-hide-scrollbar.css'])
+
     <div class="flex min-h-screen bg-gray-50 font-sans">
         <x-sidebar />
 
-        <main class="w-full overflow-y-auto p-6 lg:p-10">
-            <div class="max-w-6xl mx-auto">
+        {{-- Class 'no-scrollbar' diterapkan di sini (pastikan ada di file CSS Anda) --}}
+        <main class="w-full overflow-y-auto p-6 lg:p-6 no-scrollbar h-screen">
+            <div class="max-w-7xl mx-auto pb-20">
+
+            {{-- Header Halaman --}}
+            <x-pageheaderdua
+                title="Kelola Pendaftaran" 
+                description="Kelola persetujuan pendaftaran siswa baru" 
+            />
                 
+                {{-- Tombol Kembali & Judul --}}
                 <div class="flex items-center gap-3 mb-8">
                     <a href="{{ route('admin.pendaftaran.index') }}" class="text-gray-500 hover:text-gray-800 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -18,6 +30,7 @@
                     <h1 class="text-2xl font-bold text-gray-900">Detail Data Pendaftar</h1>
                 </div>
 
+                {{-- CARD INFO UTAMA (FOTO & STATUS) --}}
                 <div class="bg-white rounded-3xl shadow-sm p-8 mb-8">
                     <div class="flex flex-col md:flex-row gap-8 items-start">
                         <div class="flex-shrink-0 mx-auto md:mx-0">
@@ -32,13 +45,14 @@
                                 <h2 class="text-2xl font-bold text-gray-900">{{ $pendaftaran->nama_siswa }}</h2>
                                 
                                 @php
-                                    $statusColor = match($pendaftaran->status) {
-                                        'Disetujui' => 'bg-green-100 text-green-800 border-green-200',
-                                        'Ditolak' => 'bg-red-100 text-red-800 border-red-200',
-                                        default => 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                                    $statusColor = match(strtolower($pendaftaran->status)) {
+                                        'disetujui', 'diterima' => 'bg-teal-100 text-teal-700 border-teal-500',
+                                        'ditolak' => 'bg-red-100 text-red-700 border-red-500',
+                                        default => 'bg-yellow-100 text-yellow-700 border-yellow-500'
                                     };
                                 @endphp
-                                <span class="px-4 py-1 rounded-full text-sm font-semibold border {{ $statusColor }}">
+
+                                <span class="px-4 py-1 rounded-full text-sm font-bold border-2 {{ $statusColor }}">
                                     {{ ucfirst($pendaftaran->status) }}
                                 </span>
                             </div>
@@ -62,12 +76,13 @@
                     </div>
                 </div>
 
+                {{-- CARD INFO LENGKAP --}}
                 <div class="bg-white rounded-3xl shadow-sm p-8 mb-8">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Informasi Lengkap</h3>
                     <div class="h-px bg-gray-200 w-full mb-6"></div>
 
                     <div class="grid grid-cols-1 md:grid-cols-[220px_20px_auto] gap-y-4 text-sm md:text-base">
-                        
+                        {{-- Data Diri --}}
                         <div class="font-bold text-gray-700">Nama Lengkap</div>
                         <div class="hidden md:block">:</div>
                         <div class="text-gray-900">{{ $pendaftaran->nama_siswa }}</div>
@@ -88,6 +103,7 @@
                         <div class="hidden md:block">:</div>
                         <div class="text-gray-900">{{ $pendaftaran->alamat ?? '-' }}</div>
 
+                        {{-- Data Ortu --}}
                         <div class="font-bold text-gray-700 mt-2">Nama Ayah</div>
                         <div class="hidden md:block mt-2">:</div>
                         <div class="text-gray-900 mt-2">{{ $pendaftaran->nama_ayah ?? '...' }}</div>
@@ -118,6 +134,7 @@
                     </div>
                 </div>
 
+                {{-- CARD DOKUMEN PERSYARATAN --}}
                 <div class="bg-white rounded-3xl shadow-sm p-8 mb-8">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Dokumen Persyaratan</h3>
                     <div class="h-px bg-gray-200 w-full mb-2"></div>
@@ -178,28 +195,32 @@
                     </div>
                 </div>
 
+                {{-- TOMBOL AKSI FOOTER (Hanya jika Pending) --}}
                 <div class="flex justify-end gap-4 mb-10">
-                    <button id="btnSetujui" data-id="{{ $pendaftaran->id_pendaftaran }}" type="button"
-                        class="inline-flex items-center px-6 py-3 bg-green-500 hover:bg-green-600 text-white text-base font-medium rounded-lg transition shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Setujui Pendaftaran
-                    </button>
+                    @if(strtolower($pendaftaran->status) === 'pending')
+                        <button id="btnSetujui" data-id="{{ $pendaftaran->id_pendaftaran }}" type="button"
+                            class="inline-flex items-center px-6 py-3 bg-green-500 hover:bg-green-600 text-white text-base font-medium rounded-lg transition shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Setujui Pendaftaran
+                        </button>
 
-                    <button id="btnTolak" data-id="{{ $pendaftaran->id_pendaftaran }}" type="button"
-                        class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white text-base font-medium rounded-lg transition shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Tolak Pendaftaran
-                    </button>
+                        <button id="btnTolak" data-id="{{ $pendaftaran->id_pendaftaran }}" type="button"
+                            class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white text-base font-medium rounded-lg transition shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Tolak Pendaftaran
+                        </button>
+                    @endif
                 </div>
 
             </div>
         </main>
     </div>
 
+    {{-- MODAL DOCUMENT --}}
     <div id="documentModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900 bg-opacity-75 transition-opacity duration-300">
         <div class="bg-white rounded-lg shadow-2xl w-11/12 h-5/6 max-w-5xl flex flex-col">
             <div class="p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-lg">
@@ -216,7 +237,9 @@
         </div>
     </div>
 
+    {{-- SCRIPT LENGKAP (MODAL & TOMBOL AKSI) --}}
     <script>
+        // --- 1. SCRIPT UNTUK MODAL ---
         function openDocumentModal(url) {
             const modal = document.getElementById('documentModal');
             const iframe = document.getElementById('documentFrame');
@@ -232,8 +255,67 @@
             modal.classList.remove('flex');
             iframe.src = '';
         }
-        
-        // Pastikan logika JavaScript untuk btnSetujui dan btnTolak ada di file JS utama Anda
-        // atau tambahkan script AJAX/Form submission di sini jika diperlukan.
+
+        // --- 2. SCRIPT UNTUK TOMBOL SETUJUI/TOLAK ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnSetujui = document.getElementById('btnSetujui');
+            const btnTolak = document.getElementById('btnTolak');
+
+            // Event Listener untuk Setujui
+            if(btnSetujui) {
+                btnSetujui.addEventListener('click', function() {
+                    handleAction(this.dataset.id, 'approve');
+                });
+            }
+
+            // Event Listener untuk Tolak
+            if(btnTolak) {
+                btnTolak.addEventListener('click', function() {
+                    handleAction(this.dataset.id, 'reject');
+                });
+            }
+        });
+
+        // Fungsi Utama Handle Request
+        function handleAction(id, action) {
+            const label = action === 'approve' ? 'menyetujui' : 'menolak';
+            // Sesuaikan route URL ini jika perlu (pastikan /admin/pendaftaran ada di routes)
+            const url = action === 'approve' 
+                ? `{{ url('admin/pendaftaran') }}/${id}/approve` 
+                : `{{ url('admin/pendaftaran') }}/${id}/reject`;
+
+            if(!confirm(`Apakah Anda yakin ingin ${label} pendaftaran ini?`)) return;
+
+            // Tampilkan Loading pada tombol yang diklik
+            const btn = action === 'approve' ? document.getElementById('btnSetujui') : document.getElementById('btnTolak');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
+            btn.disabled = true;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    window.location.reload();
+                } else {
+                    alert('Gagal: ' + (data.message || 'Terjadi kesalahan'));
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Terjadi kesalahan sistem');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
     </script>
 @endsection

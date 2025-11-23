@@ -3,497 +3,305 @@
 @section('title', 'Kelola Pendaftaran')
 
 @section('content')
+
+{{-- LOAD CSS KUSTOM DARI FILE RESOURCES --}}
+@vite(['resources/css/custom-dropdown.css'])
+
 <div class="flex min-h-screen bg-white">
 
     {{-- Sidebar Component --}}
     <x-sidebar />
 
-    <main class="w-full overflow-y-auto p-6 md:p-12">
-        {{-- Font Awesome CDN --}}
+    <main class="w-full overflow-y-auto p-6 md:p-6">
+        
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    {{-- Sidebar --}}
-    <x-sidebar />
 
-    <main class="w-full overflow-y-auto p-6 md:p-12">
-
-        {{-- Font Awesome --}}
-        <link rel="stylesheet"
-              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-
-        {{-- Header --}}
-        <div class="mb-6">
-            <h1 class="text-3xl font-bold text-gray-900">Kelola Pendaftaran</h1>
-            <p class="mt-1 text-gray-600">Kelola data pendaftar di sini!</p>
-        </div>
-
-        {{-- Garis Pemisah --}}
-        <hr class="my-5 h-px border-0 bg-gray-200">
-
-        {{-- Data Pendaftar --}}
-        <div class="mb-6 flex justify-between items-center">
-            <h2 class="text-xl font-semibold text-gray-900">Data Pendaftar</h2>
+        <div class="max-w-7xl mx-auto">
             
-            {{-- Tombol Ekspor Data --}}
+            <x-pageheadersatu
+                title="Kelola Pendaftaran" 
+                description="Kelola data pendaftar di sini!" 
+            />
 
-            <a href="{{ route('admin.export.pendaftaran') }}"
-               class="inline-flex items-center gap-1.5 bg-white hover:bg-gray-100 border-2 border-gray-900
-                      text-gray-900 font-medium py-1.5 px-3.5 text-sm rounded-lg shadow-sm transition">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Ekspor Data
-            </a>
-        </div>
-
-        {{-- Filter Bar - FIXED VERSION --}}
-        {{-- Filter --}}
-        <div class="mb-6 bg-white p-4 rounded-xl shadow-md border border-gray-200">
-            <form id="filterForm"
-                  action="{{ route('admin.pendaftaran.index') }}"
-                  method="GET"
-                  class="flex flex-wrap items-center gap-3">
-
-                {{-- Search --}}
-                <div class="flex-1 min-w-[200px] max-w-sm">
-                    <div class="relative">
-                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                        <input type="text" name="search" placeholder="Cari"
-                               value="{{ request('search') }}"
-                               class="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-300
-                                      focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
-                               onchange="this.form.submit()">
-                    </div>
-                </div>
-
-                {{-- Sort Nama --}}
-                <div>
-                    <button type="button" id="toggleSortNama"
-                            class="py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700
-                                   text-sm flex items-center gap-2 hover:bg-gray-50 transition">
-                        <span>Nama</span>
-                        <span id="sortNamaArrow" class="text-xs">
-                            @if(request('sort_by') === 'nama_desc') 
-                                &#x25B2; 
-                            @elseif(request('sort_by') === 'nama_asc')
-                                &#x25BC;
-                            @else
-                                &#x25BC;
-                            @endif
-                        </span>
-                    </button>
-                </div>
-
-                {{-- Filter Status --}}
-                <select name="status"
-                    class="py-2 px-4.5 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm
-                        focus:ring-blue-500 focus:border-blue-500"
-                    onchange="this.form.submit()">
-                    <option value="">Semua Status</option>
-                        class="py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm
-                               focus:ring-blue-500 focus:border-blue-500"
-                        onchange="this.form.submit()">
-                    <option value="">Status</option>
-                    @foreach ($list_status as $status)
-                        <option value="{{ $status }}"
-                                {{ request('status') == $status ? 'selected' : '' }}>
-                            {{ ucfirst($status) }}
-                        </option>
-                    @endforeach
-                </select>
-
-                {{-- Sort Tanggal --}}
-                <div>
-                    <button type="button" id="toggleSortTanggal"
-                            class="py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700
-                                   text-sm flex items-center gap-2 hover:bg-gray-50 transition">
-                        <span>Tanggal Daftar</span>
-                        <span id="sortTanggalArrow" class="text-xs">
-                            @if(request('sort_by') === 'tanggal_asc') 
-                                &#x25B2;
-                            @else
-                                &#x25BC;
-                            @endif
-                            @if(request('sort_by') === 'tanggal_asc') &#x25B2; @else &#x25BC; @endif
-                        </span>
-                    </button>
-                </div>
-
-                {{-- Filter Asal Sekolah --}}
-                <select name="asal_sekolah"
-                   class="py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm 
-                        focus:ring-blue-500 focus:border-blue-500"
-                    onchange="this.form.submit()">
-                    <option value="">Semua Sekolah</option>
-                        class="py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm
-                               focus:ring-blue-500 focus:border-blue-500"
-                        onchange="this.form.submit()">
-                    <option value="">Asal Sekolah</option>
-                    @foreach ($list_sekolah as $sekolah)
-                        <option value="{{ $sekolah }}"
-                                {{ request('asal_sekolah') == $sekolah ? 'selected' : '' }}>
-                            {{ $sekolah }}
-                        </option>
-                    @endforeach
-                </select>
-
-                {{-- Hidden input untuk sort_by - PENTING: Di dalam form --}}
-                <input type="hidden" name="sort_by" id="hiddenSortBy" value="{{ request('sort_by', '') }}">
-                {{-- Hidden Sort --}}
-                <input type="hidden" name="sort_by" id="sort_by_input" value="{{ request('sort_by') }}">
-
-            </form>
-        </div>
-
-        {{-- Table --}}
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-            <div class="overflow-x-auto">
-
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Nama Lengkap</th>
-                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">NISN</th>
-                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Asal Sekolah</th>
-                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Tanggal Daftar</th>
-                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
-                            <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Aksi</th>
-                        </tr>
-                    </thead>
-
-                    <tbody class="bg-white divide-y divide-gray-100">
-
-                        @forelse ($pendaftarans as $p)
-                        <tr class="hover:bg-gray-50 transition">
-
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                {{ $p->nama_siswa }}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                {{ $p->nisn ?? '-' }}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                {{ $p->asal_sekolah }}
-                            </td>
-                            {{-- Nama --}}
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                {{ $p->nama_siswa }}
-                            </td>
-
-                            {{-- NISN --}}
-                            <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                {{ $p->nisn ?? '-' }}
-                            </td>
-
-                            {{-- Asal Sekolah --}}
-                            <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                {{ $p->asal_sekolah }}
-                            </td>
-
-                            {{-- Tanggal --}}
-                            <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                {{ \Carbon\Carbon::parse($p->created_at)->locale('id')->isoFormat('dddd, D MMM YYYY') }}
-                            </td>
-
-                            {{-- Status --}}
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @php
-                                    $statusConfig = [
-                                        'diterima' => ['bg' => 'bg-teal-100', 'text' => 'text-teal-700', 'label' => 'Diterima'],
-                                        'pending'  => ['bg' => 'bg-yellow-100', 'text' => 'text-yellow-700', 'label' => 'Pending'],
-                                        'ditolak'  => ['bg' => 'bg-red-100', 'text' => 'text-red-700', 'label' => 'Ditolak'],
-                                    ];
-                                    $config = $statusConfig[strtolower($p->status)]
-                                              ?? ['bg' => 'bg-gray-100', 'text' => 'text-gray-700', 'label' => ucfirst($p->status)];
-                                @endphp
-
-                                <span class="inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-full
-                                             {{ $config['bg'] }} {{ $config['text'] }}">
-                                    {{ $config['label'] }}
-                                </span>
-                            </td>
-
-                            {{-- Aksi --}}
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex justify-center gap-2">
-
-                                    {{-- Detail --}}
-                                    <a href="{{ route('admin.pendaftaran.show', $p->id_pendaftaran) }}"
-                                       class="inline-flex items-center bg-blue-500 hover:bg-blue-600 text-white
-                                              text-xs font-medium px-4 py-2 rounded-lg transition">
-                                        Detail
-                                    </a>
-
-                                    @php
-                                        $isPending = strtolower($p->status) === 'pending';
-                                        $isDisabled = !$isPending;
-                                        $setujuClass = $isPending ? 'bg-teal-500 hover:bg-teal-600' : 'bg-gray-300 cursor-not-allowed';
-                                        $tolakClass = $isPending ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-300 cursor-not-allowed';
-                                    @endphp
-                                    
-                                    {{-- Tombol Setuju --}}
-                                    <button
-                                        class="setuju-btn inline-flex items-center text-white text-xs font-medium px-4 py-2 rounded-lg transition {{ $setujuClass }}"
-                                        onclick="handleAction(this, '{{ route('admin.pendaftaran.approve', $p->id_pendaftaran) }}', 'setuju', {{ $p->id_pendaftaran }})"
-                                        {{ $isDisabled ? 'disabled' : '' }}>
-                                        Setuju
-                                    </button>
-
-                                    {{-- Tombol Tolak --}}
-                                    <button
-                                        class="tolak-btn inline-flex items-center text-white text-xs font-medium px-4 py-2 rounded-lg transition {{ $tolakClass }}"
-                                        onclick="handleAction(this, '{{ route('admin.pendaftaran.reject', $p->id_pendaftaran) }}', 'tolak', {{ $p->id_pendaftaran }})"
-                                        {{ $isDisabled ? 'disabled' : '' }}>
-                                        $tolakClass  = $isPending ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-300 cursor-not-allowed';
-
-                                        if (strtolower($p->status) === 'diterima' || strtolower($p->status) === 'ditolak') {
-                                            $setujuClass = $tolakClass = 'bg-gray-300 cursor-not-allowed';
-                                            $isDisabled = true;
-                                        }
-                                    @endphp
-
-                                    {{-- Setuju --}}
-                                    <button class="setuju-btn inline-flex items-center text-white text-xs font-medium
-                                                   px-4 py-2 rounded-lg transition {{ $setujuClass }}"
-                                            onclick="handleAction(this, '{{ route('admin.pendaftaran.approve', $p->id_pendaftaran) }}',
-                                                                    'setuju', {{ $p->id_pendaftaran }})"
-                                            {{ $isDisabled ? 'disabled' : '' }}>
-                                        Setuju
-                                    </button>
-
-                                    {{-- Tolak --}}
-                                    <button class="tolak-btn inline-flex items-center text-white text-xs font-medium
-                                                   px-4 py-2 rounded-lg transition {{ $tolakClass }}"
-                                            onclick="handleAction(this, '{{ route('admin.pendaftaran.reject', $p->id_pendaftaran) }}',
-                                                                    'tolak', {{ $p->id_pendaftaran }})"
-                                            {{ $isDisabled ? 'disabled' : '' }}>
-                                        Tolak
-                                    </button>
-
-                                </div>
-                            </td>
-
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-12 text-center">
-                                <div class="flex flex-col items-center gap-2">
-                                    <i class="fas fa-inbox text-4xl text-gray-300"></i>
-                                    <p class="text-gray-500 font-medium">
-                                        Tidak ada data pendaftaran yang sesuai dengan filter.
-                                    </p>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
-
-                    </tbody>
-                </table>
-
+            {{-- Toolbar --}}
+            <div class="mb-6 flex flex-col gap-3 items-start">
+                <h2 class="text-xl font-semibold text-black">Daftar Pendaftar</h2>
+                
+                <a href="{{ route('admin.export.pendaftaran') }}"
+                   class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-sm transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Ekspor Excel
+                </a>
             </div>
 
-            {{-- Pagination --}}
-            @if($pendaftarans->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200">
-                <div class="flex justify-center">
+            {{-- Filter Bar --}}
+            <div class="mb-6">
+                <form id="filterForm" action="{{ route('admin.pendaftaran.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
+
+                    {{-- Search --}}
+                    <div class="flex-1 min-w-[200px] max-w-3xl relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" name="search" placeholder="Cari nama atau NISN..."
+                               value="{{ request('search') }}"
+                               class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 bg-white focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
+                    </div>
+
+                    {{-- 2. CUSTOM DROPDOWN STATUS --}}
+                    <div class="custom-select-container" id="dropdownStatus">
+                        <input type="hidden" name="status" value="{{ request('status') }}">
+                        
+                        <div class="custom-select-trigger">
+                            <span>
+                                {{ request('status') ? ucfirst(request('status')) : 'Semua Status' }}
+                            </span>
+                            <i class="fas fa-chevron-down arrow"></i>
+                        </div>
+
+                        <div class="custom-select-options">
+                            <div class="custom-select-option {{ request('status') == '' ? 'selected' : '' }}" data-value="">
+                                Semua Status
+                            </div>
+                            @foreach ($list_status as $status)
+                                <div class="custom-select-option {{ request('status') == $status ? 'selected' : '' }}" 
+                                     data-value="{{ $status }}">
+                                    {{ ucfirst($status) }}
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- 3. CUSTOM DROPDOWN ASAL SEKOLAH --}}
+                    <div class="custom-select-container" id="dropdownSekolah">
+                        <input type="hidden" name="asal_sekolah" value="{{ request('asal_sekolah') }}">
+                        
+                        <div class="custom-select-trigger">
+                            <span class="truncate max-w-[150px]">
+                                {{ request('asal_sekolah') ? request('asal_sekolah') : 'Semua Sekolah' }}
+                            </span>
+                            <i class="fas fa-chevron-down arrow"></i>
+                        </div>
+
+                        <div class="custom-select-options">
+                            <div class="custom-select-option {{ request('asal_sekolah') == '' ? 'selected' : '' }}" data-value="">
+                                Semua Sekolah
+                            </div>
+                            @foreach ($list_sekolah as $sekolah)
+                                <div class="custom-select-option {{ request('asal_sekolah') == $sekolah ? 'selected' : '' }}" 
+                                     data-value="{{ $sekolah }}">
+                                    {{ $sekolah }}
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Tombol Sort Nama --}}
+                    <button type="button" id="toggleSortNama" class="py-2.5 px-4 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 text-sm flex items-center gap-2 transition shadow-sm">
+                        <span>Nama</span>
+                        <span class="text-xs text-gray-500">
+                            @if(request('sort_by') === 'nama_desc') ▼ @elseif(request('sort_by') === 'nama_asc') ▲ @else ↕ @endif
+                        </span>
+                    </button>
+
+                    {{-- Tombol Sort Tanggal --}}
+                    <button type="button" id="toggleSortTanggal" class="py-2.5 px-4 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 text-sm flex items-center gap-2 transition shadow-sm">
+                        <span>Tanggal</span>
+                        <span class="text-xs text-gray-500">
+                            @if(request('sort_by') === 'tanggal_asc') ▲ @else ▼ @endif
+                        </span>
+                    </button>
+
+                    <input type="hidden" name="sort_by" id="hiddenSortBy" value="{{ request('sort_by') }}">
+                </form>
+            </div>
+
+            {{-- Table --}}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nama Lengkap</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">NISN</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Asal Sekolah</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tanggal Daftar</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-100">
+                            @forelse ($pendaftarans as $p)
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">{{ $p->nama_siswa }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-500">{{ $p->nisn ?? '-' }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-500">{{ $p->asal_sekolah }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-500">
+                                        {{ \Carbon\Carbon::parse($p->created_at)->translatedFormat('d M Y') }}
+                                    </div>
+                                    <div class="text-xs text-gray-400">
+                                        {{ \Carbon\Carbon::parse($p->created_at)->format('H:i') }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @php
+                                        $statusConfig = match(strtolower($p->status)) {
+                                            'diterima', 'disetujui' => 'bg-teal-100 text-teal-700 border-teal-700',
+                                            'ditolak' => 'bg-red-100 text-red-700 border-red-500',
+                                            default => 'bg-yellow-100 text-yellow-700 border-yellow-500'
+                                        };
+                                    @endphp
+                                    <span class="inline-flex items-center px-4 py-1 rounded-full text-xs font-bold border-2 {{ $statusConfig }}">
+                                        {{ ucfirst($p->status) }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                    <div class="flex justify-center items-center gap-2">
+                                        
+                                        {{-- 1. TOMBOL DETAIL (Indigo/Biru) --}}
+                                        <a href="{{ route('admin.pendaftaran.show', $p->id_pendaftaran) }}" 
+                                        class="inline-flex items-center px-3 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-600 text-xs font-semibold transition-all duration-200 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 shadow-sm hover:shadow-md">
+                                            Detail
+                                        </a>
+
+                                        @php $isPending = strtolower($p->status) === 'pending'; @endphp
+
+                                        @if($isPending)
+                                            {{-- 2. TOMBOL SETUJUI (Emerald/Hijau Segar) --}}
+                                            <button onclick="handleAction(this, '{{ route('admin.pendaftaran.approve', $p->id_pendaftaran) }}', 'setuju')"
+                                                class="inline-flex items-center px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-600 text-xs font-semibold transition-all duration-200 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 shadow-sm hover:shadow-md">
+                                                Setujui
+                                            </button>
+
+                                            {{-- 3. TOMBOL TOLAK (Rose/Merah Lembut) --}}
+                                            <button onclick="handleAction(this, '{{ route('admin.pendaftaran.reject', $p->id_pendaftaran) }}', 'tolak')"
+                                                class="inline-flex items-center px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 text-xs font-semibold transition-all duration-200 hover:bg-rose-500 hover:text-white hover:border-rose-500 shadow-sm hover:shadow-md">
+                                                Tolak
+                                            </button>
+                                        @else
+                                            {{-- STATE DISABLED / MATI --}}
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-400 text-xs font-semibold cursor-not-allowed opacity-60">
+                                                Setujui
+                                            </span>
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-400 text-xs font-semibold cursor-not-allowed opacity-60">
+                                                Tolak
+                                            </span>
+                                        @endif
+
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                                    <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                                    <p>Tidak ada data pendaftaran yang ditemukan.</p>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                @if($pendaftarans->hasPages())
+                <div class="px-6 py-4 border-t border-gray-200">
                     {{ $pendaftarans->appends(request()->except('page'))->links() }}
                 </div>
+                @endif
             </div>
-            @endif
-
         </div>
-
     </main>
-
 </div>
 
 <script>
-// ========================================
-// FIXED: Logika Sorting & Filter
-// ========================================
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- LOGIKA UNTUK CUSTOM DROPDOWN ---
+        const dropdowns = document.querySelectorAll('.custom-select-container');
 
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('filterForm');
-    const hiddenSortBy = document.getElementById('hiddenSortBy');
-    const currentSort = '{{ request("sort_by", "") }}';
+        dropdowns.forEach(dropdown => {
+            const trigger = dropdown.querySelector('.custom-select-trigger');
+            const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+            const options = dropdown.querySelectorAll('.custom-select-option');
 
-    // ===== 1. SORT NAMA =====
-    const toggleSortNamaBtn = document.getElementById('toggleSortNama');
-    const sortNamaArrow = document.getElementById('sortNamaArrow');
-    
-    toggleSortNamaBtn.addEventListener('click', () => {
-        let newSort = 'nama_asc'; // Default: A-Z
-        
-        if (currentSort === 'nama_asc') {
-            newSort = 'nama_desc'; // Toggle ke Z-A
-        }
-        
-        // Update hidden input dan submit
-        hiddenSortBy.value = newSort;
-        form.submit();
-    });
+            trigger.addEventListener('click', (e) => {
+                dropdowns.forEach(other => { if (other !== dropdown) other.classList.remove('open'); });
+                dropdown.classList.toggle('open');
+                e.stopPropagation();
+            });
 
-    // ===== 2. SORT TANGGAL =====
-    const toggleSortTanggalBtn = document.getElementById('toggleSortTanggal');
-    const sortTanggalArrow = document.getElementById('sortTanggalArrow');
-    
-    toggleSortTanggalBtn.addEventListener('click', () => {
-        let newSort = 'tanggal_desc'; // Default: Terbaru
-        
-        if (currentSort === 'tanggal_desc') {
-            newSort = 'tanggal_asc'; // Toggle ke Terlama
-        }
-        
-        // Update hidden input dan submit
-        hiddenSortBy.value = newSort;
-        form.submit();
-    });
+            options.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const value = option.getAttribute('data-value');
+                    const text = option.innerText;
+                    trigger.querySelector('span').innerText = text;
+                    hiddenInput.value = value;
+                    dropdown.classList.remove('open');
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    document.getElementById('filterForm').submit();
+                    e.stopPropagation();
+                });
+            });
+        });
 
-    // ===== 3. CLEAR SORT ketika filter lain diubah =====
-    // Opsional: Reset sort ke default ketika user mengubah filter lain
-    const filterInputs = form.querySelectorAll('input[name="search"], select[name="status"], select[name="asal_sekolah"]');
-    
-    filterInputs.forEach(input => {
-        input.addEventListener('change', () => {
-            // Biarkan sort tetap ada, tidak di-reset
-            // Jika ingin reset sort saat filter berubah, uncomment baris berikut:
-            // hiddenSortBy.value = '';
+        window.addEventListener('click', () => {
+            dropdowns.forEach(dropdown => dropdown.classList.remove('open'));
+        });
+
+
+        // --- LOGIKA SORTING & ACTION ---
+        const form = document.getElementById('filterForm');
+        const hiddenSortBy = document.getElementById('hiddenSortBy');
+
+        document.getElementById('toggleSortNama')?.addEventListener('click', () => {
+            const current = hiddenSortBy.value;
+            hiddenSortBy.value = (current === 'nama_asc') ? 'nama_desc' : 'nama_asc';
+            form.submit();
+        });
+
+        document.getElementById('toggleSortTanggal')?.addEventListener('click', () => {
+            const current = hiddenSortBy.value;
+            hiddenSortBy.value = (current === 'tanggal_desc') ? 'tanggal_asc' : 'tanggal_desc';
+            form.submit();
         });
     });
-});
 
-// ========================================
-// Logika Approve/Reject dengan AJAX
-// ========================================
+    function handleAction(btn, url, type) {
+        if (btn.disabled) return;
+        const label = type === 'setuju' ? 'Menerima' : 'Menolak';
+        if (!confirm(`Anda yakin ingin ${label} pendaftar ini?`)) return;
 
-function handleAction(btn, url, actionType, idPendaftaran) {
-    if (btn.disabled) return;
+        const originalContent = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-    const actionLabel = actionType === 'setuju' ? 'Menerima' : 'Menolak';
-
-    // Konfirmasi dari user
-    const confirmation = window.confirm(`Anda yakin ingin ${actionLabel} pendaftar ini?`);
-    if (!confirmation) return;
-
-    // Disable button dan tampilkan loading
-    btn.disabled = true;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Proses...`;
-
-    // Kirim request AJAX
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(err => {
-                throw new Error(err.message || `HTTP error: ${response.status}`);
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            // Reload halaman untuk update tampilan
-            window.location.reload();
-        } else {
-            alert('Aksi gagal: ' + (data.message || 'Unknown Error'));
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) window.location.reload();
+            else { alert('Gagal: ' + data.message); btn.disabled = false; btn.innerHTML = originalContent; }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Terjadi kesalahan server.');
             btn.disabled = false;
-            btn.innerHTML = originalText;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Terjadi kesalahan: ' + error.message);
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-    });
-}
+            btn.innerHTML = originalContent;
+        });
+    }
 </script>
 
-@endsection
-    {{-- SCRIPT --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-
-            const filterForm = document.getElementById('filterForm');
-            const sortInput = document.getElementById('sort_by_input');
-
-            if (!filterForm || !sortInput) return;
-
-            // Sort Nama
-            const sortNamaBtn = document.getElementById('toggleSortNama');
-            if (sortNamaBtn) {
-                sortNamaBtn.addEventListener('click', () => {
-                    sortInput.value = sortInput.value === 'nama_asc' ? 'nama_desc' : 'nama_asc';
-                    filterForm.submit();
-                });
-            }
-
-            // Sort Tanggal
-            const sortTanggalBtn = document.getElementById('toggleSortTanggal');
-            if (sortTanggalBtn) {
-                sortTanggalBtn.addEventListener('click', () => {
-                    sortInput.value = sortInput.value === 'tanggal_desc'
-                                      ? 'tanggal_asc'
-                                      : 'tanggal_desc';
-                    filterForm.submit();
-                });
-            }
-        });
-
-        // APPROVE / REJECT HANDLER
-        function handleAction(btn, url, type, id) {
-
-            if (btn.disabled) return;
-
-            const label = type === 'setuju' ? 'Menerima' : 'Menolak';
-            const ok = window.confirm(`Anda yakin ingin ${label} pendaftar ini?`);
-            if (!ok) return;
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Proses';
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(res => {
-                if (!res.ok) {
-                    return res.json().then(err => {
-                        throw new Error(err.message || `HTTP ${res.status}`);
-                    });
-                }
-                return res.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert('Aksi gagal: ' + (data.message || 'Unknown'));
-                    btn.disabled = false;
-                    btn.innerHTML = label;
-                }
-            })
-            .catch(err => {
-                alert('Error: ' + err.message);
-                btn.disabled = false;
-                btn.innerHTML = label;
-            });
-        }
-    </script>
-
-</div>
 @endsection
