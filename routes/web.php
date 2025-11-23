@@ -12,7 +12,7 @@ use App\Http\Controllers\Admin\AdminKontenController;
 use Illuminate\Http\Request;
 use App\Models\Pendaftaran;
 
-Route::get('/', [LandingPageController::class, 'index'])->name('home');
+
 
 
 
@@ -21,10 +21,7 @@ Route::get('/', [LandingPageController::class, 'index'])->name('home');
 | Halaman Utama
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
-    return view('welcome');
-});
-
+Route::get('/', [LandingPageController::class, 'index'])->name('home');
 
 /*
 |--------------------------------------------------------------------------
@@ -89,13 +86,13 @@ require __DIR__ . '/auth.php';
 */
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    // Guest (Login)
-    Route::middleware('guest:admin')->group(function () {
-        Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])
-            ->name('login');
+    // // Guest (Login)
+    // Route::middleware('guest:admin')->group(function () {
+    //     Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])
+    //         ->name('login');
 
-        Route::post('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'store']);
-    });
+    //     Route::post('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'store']);
+    // });
     // Rute Guest (Login) untuk Admin
     // Route::middleware('guest:admin')->group(function () {
     //     Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])->name('login');
@@ -106,8 +103,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Authenticated Admin
     Route::middleware('auth:admin')->group(function () {
 
-        Route::post('/logout', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'destroy'])
-            ->name('logout');
+        // Route::post('/logout', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'destroy'])
+        //     ->name('logout');
 
         // Dashboard Admin
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])

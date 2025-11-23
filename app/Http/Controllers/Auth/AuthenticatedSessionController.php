@@ -28,64 +28,72 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login'); // Atau buat view terpisah: 'auth.admin-login'
     }
 
-    /**
-     * Handle an incoming authentication request (User).
+   /**
+     * Handle an incoming authentication request (Final Version).
      */
     public function store(LoginRequest $request): RedirectResponse
     {
         $credentials = $request->only('email', 'password');
         $remember = $request->boolean('remember');
 
-        // ===== DETEKSI ROLE OTOMATIS =====
-
         // 1. Cek Admin
         if (\App\Models\Admin::where('email', $credentials['email'])->exists()) {
             if (Auth::guard('admin')->attempt($credentials, $remember)) {
                 Log::info('Admin Login Success: ' . $credentials['email']);
                 $request->session()->regenerate();
-                return redirect()->intended(route('admin.dashboard'));
+                
+                // Redirect Admin ke dashboard Admin
+                return redirect()->intended(route('admin.dashboard')); 
             }
         }
-
-        // // 2. Cek Tata Usaha
-        // elseif (\App\Models\TataUsaha::where('email', $credentials['email'])->exists()) {
-        //     if (Auth::guard('tata_usaha')->attempt($credentials, $remember)) {
-        //         Log::info('Tata Usaha Login Success: ' . $credentials['email']);
-        //         $request->session()->regenerate();
-        //         return redirect()->intended(route('tu.dashboard'));
-        //     }
-        // }
-        else {
-            if (Auth::guard('web')->attempt($credentials, $remember)) {
-                Log::info('User Login Success: ' . $credentials['email']);
-                $request->session()->regenerate();
-                return redirect()->intended('/');
-            }
+        
+        // 2. Cek User Biasa/Web
+        if (Auth::guard('web')->attempt($credentials, $remember)) {
+            Log::info('User Login Success: ' . $credentials['email']);
+            $request->session()->regenerate();
+            
+            // **TINDAKAN PENTING:** Hapus intended URL yang mungkin tersisa dari Admin
+            $request->session()->forget('url.intended'); 
+            
+            // Redirect User Biasa ke halaman utama
+            return redirect()->intended('/');
         }
-
-        // Login gagal
-        Log::warning('Login Failed for: ' . $credentials['email']);
-
-        return back()->withInput($request->only('email', 'remember'))
-            ->withErrors(['email' => 'The provided credentials do not match our records.']);
     }
 
-
-    /**
-     * Destroy an authenticated session.
+   /**
+     * Destroy an authenticated session (Multi-Guard aware & Session Cleaner).
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $loggedOut = false;
+
+        // 1. Cek dan logout dari guard 'admin'
         if (Auth::guard('admin')->check()) {
             Auth::guard('admin')->logout();
             Log::info('Admin Logged Out');
-        } else {
+            $loggedOut = true;
+        } 
+        
+        // 2. Cek dan logout dari guard 'web'
+        if (Auth::guard('web')->check()) {
             Auth::guard('web')->logout();
             Log::info('User Logged Out');
+            $loggedOut = true;
         }
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        if ($loggedOut) {
+            // **Hapus Sisa Data Sesi Penting:**
+            // Hapus kunci sesi yang menyimpan intended URL (rute tujuan setelah login)
+            $request->session()->forget('url.intended'); 
+            
+            // Hapus kunci otentikasi untuk semua guard yang mungkin
+            $request->session()->forget(Auth::guard('admin')->getName());
+            $request->session()->forget(Auth::guard('web')->getName());
+            
+            // Invalidate dan regenerate token (seperti sebelumnya)
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         return redirect('/');
     }
