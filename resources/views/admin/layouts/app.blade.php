@@ -12,13 +12,11 @@
 </head>
 
 <body class="font-sans antialiased bg-gray-100">
-    <div class="min-h-screen">
 
-        {{-- Main Content --}}
-        <main>
-            @yield('content')
-        </main>
-    </div>
+
+    <main>
+        @yield('content')
+    </main>
 
     @auth('admin')
         <script>
