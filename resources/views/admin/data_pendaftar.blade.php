@@ -1,18 +1,15 @@
 @extends('admin.layouts.app')
 
-{{-- Tambahkan meta tag CSRF di layout utama jika belum ada --}}
-{{-- <meta name="csrf-token" content="{{ csrf_token() }}"> --}}
-
 @section('title', 'Kelola Pendaftaran')
 
 @section('content')
 <div class="flex min-h-screen bg-gray-50">
 
-    {{-- Asumsi: Komponen Sidebar didefinisikan --}}
+    {{-- Sidebar Component --}}
     <x-sidebar />
 
     <main class="w-full overflow-y-auto p-6 md:p-12">
-        {{-- Inject Font Awesome CDN untuk ikon (ideal ditempatkan di layout) --}}
+        {{-- Font Awesome CDN --}}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
         {{-- Header Halaman --}}
@@ -22,14 +19,13 @@
         </div>
 
         {{-- Garis Pemisah --}}
-       <hr class="my-5 h-px border-0 bg-gray-200">
+        <hr class="my-5 h-px border-0 bg-gray-200">
 
         {{-- Data Pendaftar Section --}}
         <div class="mb-6 flex justify-between items-center">
             <h2 class="text-xl font-semibold text-gray-900">Data Pendaftar</h2>
             
             {{-- Tombol Ekspor Data --}}
-            {{-- Asumsi route('admin.export.pendaftaran') ada --}}
             <a href="{{ route('admin.export.pendaftaran') }}"
                 class="inline-flex items-center gap-1.5 bg-white hover:bg-gray-100 border-2 border-gray-900 text-gray-900 
                     font-medium py-1.5 px-3.5 text-sm rounded-lg shadow-sm transition">
@@ -40,7 +36,7 @@
             </a>
         </div>
 
-        {{-- Filter Bar --}}
+        {{-- Filter Bar - FIXED VERSION --}}
         <div class="mb-6 bg-white p-4 rounded-xl shadow-md border border-gray-200">
             <form id="filterForm" action="{{ route('admin.pendaftaran.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
 
@@ -62,17 +58,23 @@
                             class="py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm flex items-center gap-2 hover:bg-gray-50 transition">
                         <span>Nama</span>
                         <span id="sortNamaArrow" class="text-xs">
-                            @if(request('sort_by') === 'nama_desc') &#x25B2; @else &#x25BC; @endif
+                            @if(request('sort_by') === 'nama_desc') 
+                                &#x25B2; 
+                            @elseif(request('sort_by') === 'nama_asc')
+                                &#x25BC;
+                            @else
+                                &#x25BC;
+                            @endif
                         </span>
                     </button>
                 </div>
 
                 {{-- Filter Status --}}
                 <select name="status"
-                    class="py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm
+                    class="py-2 px-4.5 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm
                         focus:ring-blue-500 focus:border-blue-500"
                     onchange="this.form.submit()">
-                    <option value="">Status</option>
+                    <option value="">Semua Status</option>
                     @foreach ($list_status as $status)
                         <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
                             {{ ucfirst($status) }}
@@ -86,8 +88,11 @@
                             class="py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm flex items-center gap-2 hover:bg-gray-50 transition">
                         <span>Tanggal Daftar</span>
                         <span id="sortTanggalArrow" class="text-xs">
-                            {{-- Default: Descending (Terbaru) jika tidak ada sort_by atau sort_by tidak spesifik --}}
-                            @if(request('sort_by') === 'tanggal_asc') &#x25B2; @else &#x25BC; @endif
+                            @if(request('sort_by') === 'tanggal_asc') 
+                                &#x25B2;
+                            @else
+                                &#x25BC;
+                            @endif
                         </span>
                     </button>
                 </div>
@@ -97,7 +102,7 @@
                    class="py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm 
                         focus:ring-blue-500 focus:border-blue-500"
                     onchange="this.form.submit()">
-                    <option value="">Asal Sekolah</option>
+                    <option value="">Semua Sekolah</option>
                     @foreach ($list_sekolah as $sekolah)
                         <option value="{{ $sekolah }}" {{ request('asal_sekolah') == $sekolah ? 'selected' : '' }}>
                             {{ $sekolah }}
@@ -105,10 +110,8 @@
                     @endforeach
                 </select>
 
-                {{-- Hidden input untuk menyimpan query sort yang lain --}}
-                @if(request('search'))<input type="hidden" name="search" value="{{ request('search') }}">@endif
-                @if(request('status'))<input type="hidden" name="status" value="{{ request('status') }}">@endif
-                @if(request('asal_sekolah'))<input type="hidden" name="asal_sekolah" value="{{ request('asal_sekolah') }}">@endif
+                {{-- Hidden input untuk sort_by - PENTING: Di dalam form --}}
+                <input type="hidden" name="sort_by" id="hiddenSortBy" value="{{ request('sort_by', '') }}">
 
             </form>
         </div>
@@ -135,9 +138,15 @@
                         @forelse ($pendaftarans as $p)
                         <tr class="hover:bg-gray-50 transition">
 
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">{{ $p->nama_siswa }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{{ $p->nisn ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{{ $p->asal_sekolah }}</td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
+                                {{ $p->nama_siswa }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                {{ $p->nisn ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                {{ $p->asal_sekolah }}
+                            </td>
                             <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
                                 {{ \Carbon\Carbon::parse($p->created_at)->locale('id')->isoFormat('dddd, D MMM YYYY') }}
                             </td>
@@ -145,7 +154,6 @@
                             {{-- Badge Status --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php
-                                    // Konfigurasi warna status
                                     $statusConfig = [
                                         'diterima' => ['bg' => 'bg-teal-100', 'text' => 'text-teal-700', 'label' => 'Diterima'],
                                         'pending' => ['bg' => 'bg-yellow-100', 'text' => 'text-yellow-700', 'label' => 'Pending'],
@@ -169,23 +177,13 @@
                                     </a>
 
                                     @php
-                                        // Cek apakah tombol harus aktif (hanya jika status 'pending')
                                         $isPending = strtolower($p->status) === 'pending';
                                         $isDisabled = !$isPending;
-
-                                        // Tentukan kelas CSS berdasarkan status saat ini
                                         $setujuClass = $isPending ? 'bg-teal-500 hover:bg-teal-600' : 'bg-gray-300 cursor-not-allowed';
                                         $tolakClass = $isPending ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-300 cursor-not-allowed';
-
-                                        // Jika sudah diterima/ditolak, berikan warna sesuai status tapi tetap non-aktif
-                                        if (strtolower($p->status) === 'diterima') {
-                                            $setujuClass = 'bg-gray-300 cursor-not-allowed';
-                                        } elseif (strtolower($p->status) === 'ditolak') {
-                                            $tolakClass = 'bg-gray-300 cursor-not-allowed';
-                                        }
                                     @endphp
                                     
-                                    {{-- Tombol Setuju (Aktif hanya jika Pending) --}}
+                                    {{-- Tombol Setuju --}}
                                     <button
                                         class="setuju-btn inline-flex items-center text-white text-xs font-medium px-4 py-2 rounded-lg transition {{ $setujuClass }}"
                                         onclick="handleAction(this, '{{ route('admin.pendaftaran.approve', $p->id_pendaftaran) }}', 'setuju', {{ $p->id_pendaftaran }})"
@@ -193,7 +191,7 @@
                                         Setuju
                                     </button>
 
-                                    {{-- Tombol Tolak (Aktif hanya jika Pending) --}}
+                                    {{-- Tombol Tolak --}}
                                     <button
                                         class="tolak-btn inline-flex items-center text-white text-xs font-medium px-4 py-2 rounded-lg transition {{ $tolakClass }}"
                                         onclick="handleAction(this, '{{ route('admin.pendaftaran.reject', $p->id_pendaftaran) }}', 'tolak', {{ $p->id_pendaftaran }})"
@@ -231,107 +229,116 @@
 
     </main>
 
+</div>
+
 <script>
-    // --- Logika Sorting Client-Side ---
+// ========================================
+// FIXED: Logika Sorting & Filter
+// ========================================
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('filterForm');
+    const hiddenSortBy = document.getElementById('hiddenSortBy');
+    const currentSort = '{{ request("sort_by", "") }}';
 
-        // 1. Logika Sort Nama
-        const toggleSortNamaBtn = document.getElementById('toggleSortNama');
-        toggleSortNamaBtn.addEventListener('click', () => {
-            let currentSort = urlParams.get('sort_by');
-            let newSort = 'nama_asc'; // Default: ascending
-
-            if (currentSort === 'nama_asc') {
-                newSort = 'nama_desc';
-            }
-            
-            // Hapus semua parameter sort_by yang lain
-            urlParams.delete('sort_by');
-            urlParams.set('sort_by', newSort);
-
-            window.location.href = window.location.pathname + '?' + urlParams.toString();
-        });
-
-        // 2. Logika Sort Tanggal
-        const toggleSortTanggalBtn = document.getElementById('toggleSortTanggal');
-        toggleSortTanggalBtn.addEventListener('click', () => {
-            let currentSort = urlParams.get('sort_by');
-            let newSort = 'tanggal_desc'; // Default: descending (Terbaru)
-
-            if (currentSort === 'tanggal_desc') {
-                newSort = 'tanggal_asc';
-            }
-            
-            // Hapus semua parameter sort_by yang lain
-            urlParams.delete('sort_by');
-            urlParams.set('sort_by', newSort);
-
-            window.location.href = window.location.pathname + '?' + urlParams.toString();
-        });
-
+    // ===== 1. SORT NAMA =====
+    const toggleSortNamaBtn = document.getElementById('toggleSortNama');
+    const sortNamaArrow = document.getElementById('sortNamaArrow');
+    
+    toggleSortNamaBtn.addEventListener('click', () => {
+        let newSort = 'nama_asc'; // Default: A-Z
+        
+        if (currentSort === 'nama_asc') {
+            newSort = 'nama_desc'; // Toggle ke Z-A
+        }
+        
+        // Update hidden input dan submit
+        hiddenSortBy.value = newSort;
+        form.submit();
     });
 
-
-    // --- Logika Aksi Approve/Reject ---
-
-    function handleAction(btn, url, actionType, idPendaftaran) {
-        // Cek apakah tombol sudah dinonaktifkan dari Blade
-        if (btn.disabled) {
-            return; 
-        }
-
-        const actionLabel = actionType === 'setuju' ? 'Menerima' : 'Menolak';
-
-        // Ganti alert bawaan dengan konfirmasi modal
-        const confirmation = window.confirm(Anda yakin ingin ${actionLabel} pendaftar ini?);
+    // ===== 2. SORT TANGGAL =====
+    const toggleSortTanggalBtn = document.getElementById('toggleSortTanggal');
+    const sortTanggalArrow = document.getElementById('sortTanggalArrow');
+    
+    toggleSortTanggalBtn.addEventListener('click', () => {
+        let newSort = 'tanggal_desc'; // Default: Terbaru
         
-        if (!confirmation) {
-            return;
+        if (currentSort === 'tanggal_desc') {
+            newSort = 'tanggal_asc'; // Toggle ke Terlama
         }
+        
+        // Update hidden input dan submit
+        hiddenSortBy.value = newSort;
+        form.submit();
+    });
 
-        btn.disabled = true; // Nonaktifkan tombol saat proses berlangsung
-        btn.innerHTML = <i class="fas fa-spinner fa-spin"></i> Proses; // Tampilkan loading
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                // Ambil token CSRF dari meta tag di layout utama
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                // Lempar error jika respons bukan 2xx
-                return response.json().then(errorData => {
-                    throw new Error(errorData.message || HTTP error! status: ${response.status});
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            if(data.success){
-                // Muat ulang halaman agar data dan status tombol diperbarui
-                window.location.reload(); 
-            } else {
-                alert('Aksi gagal! Pesan: ' + (data.message || 'Unknown Error'));
-                // Kembalikan status tombol jika gagal
-                btn.disabled = false;
-                btn.innerHTML = actionLabel;
-            }
-        })
-        .catch((error) => {
-            console.error('Fetch error:', error);
-            alert('Terjadi kesalahan koneksi atau server: ' + error.message);
-            // Kembalikan status tombol jika terjadi kesalahan
-            btn.disabled = false;
-            btn.innerHTML = actionLabel;
+    // ===== 3. CLEAR SORT ketika filter lain diubah =====
+    // Opsional: Reset sort ke default ketika user mengubah filter lain
+    const filterInputs = form.querySelectorAll('input[name="search"], select[name="status"], select[name="asal_sekolah"]');
+    
+    filterInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            // Biarkan sort tetap ada, tidak di-reset
+            // Jika ingin reset sort saat filter berubah, uncomment baris berikut:
+            // hiddenSortBy.value = '';
         });
-    }
+    });
+});
+
+// ========================================
+// Logika Approve/Reject dengan AJAX
+// ========================================
+
+function handleAction(btn, url, actionType, idPendaftaran) {
+    if (btn.disabled) return;
+
+    const actionLabel = actionType === 'setuju' ? 'Menerima' : 'Menolak';
+
+    // Konfirmasi dari user
+    const confirmation = window.confirm(`Anda yakin ingin ${actionLabel} pendaftar ini?`);
+    if (!confirmation) return;
+
+    // Disable button dan tampilkan loading
+    btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Proses...`;
+
+    // Kirim request AJAX
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.message || `HTTP error: ${response.status}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Reload halaman untuk update tampilan
+            window.location.reload();
+        } else {
+            alert('Aksi gagal: ' + (data.message || 'Unknown Error'));
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan: ' + error.message);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+}
 </script>
 
-</div>
 @endsection
