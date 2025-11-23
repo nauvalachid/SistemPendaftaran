@@ -12,17 +12,14 @@ use App\Http\Controllers\Admin\AdminKontenController;
 use Illuminate\Http\Request;
 use App\Models\Pendaftaran;
 
-
-
-
-
 /*
 |--------------------------------------------------------------------------
-| Halaman Utama
+| Halaman Utama (Landing Page)
 |--------------------------------------------------------------------------
 */
 Route::get('/', [LandingPageController::class, 'index'])->name('home');
 Route::get('/pendaftaran', [PendaftaranController::class, 'index'])->name('pendaftaran.index');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -32,7 +29,6 @@ Route::get('/pendaftaran', [PendaftaranController::class, 'index'])->name('penda
 Route::get('/dashboard', function () {
 
     if (session()->has('pending_pendaftaran')) {
-
         $pendingData = session('pending_pendaftaran');
         session()->forget('pending_pendaftaran');
 
@@ -53,14 +49,12 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
-
 /*
 |--------------------------------------------------------------------------
 | ROUTE USER (AUTH)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -87,65 +81,46 @@ require __DIR__ . '/auth.php';
 */
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    // // Guest (Login)
-    // Route::middleware('guest:admin')->group(function () {
-    //     Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])
-    //         ->name('login');
-
-    //     Route::post('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'store']);
-    // });
-    // Rute Guest (Login) untuk Admin
-    // Route::middleware('guest:admin')->group(function () {
-    //     Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])->name('login');
-    //     Route::post('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'store']);
-    // });
-
+    // Guest (Login Admin)
+    Route::middleware('guest:admin')->group(function () {
+        Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])->name('login');
+        Route::post('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'store']);
+    });
 
     // Authenticated Admin
     Route::middleware('auth:admin')->group(function () {
 
-        // Route::post('/logout', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'destroy'])
-        //     ->name('logout');
+        Route::post('/logout', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
         // Dashboard Admin
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-            ->name('dashboard');
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
         /*
         |--------------------------------------------------------------------------
         | CRUD Pendaftaran oleh Admin
         |--------------------------------------------------------------------------
         */
-       
-
-        // Index + Show
         Route::resource('pendaftaran', AdminPendaftaranController::class)
             ->only(['index', 'show'])
             ->names('pendaftaran');
 
-        // Download Dokumen
-        Route::get('pendaftaran/{pendaftaran}/download/{field}', 
-            [AdminPendaftaranController::class, 'download']
-        )->name('pendaftaran.download');
+        Route::get('pendaftaran/{pendaftaran}/download/{field}', [AdminPendaftaranController::class, 'download'])->name('pendaftaran.download');
+        Route::post('pendaftaran/{pendaftaran}/approve', [AdminPendaftaranController::class, 'approve'])->name('pendaftaran.approve');
+        Route::post('pendaftaran/{pendaftaran}/reject', [AdminPendaftaranController::class, 'reject'])->name('pendaftaran.reject');
+        Route::get('/export/pendaftaran', [AdminExportController::class, 'export'])->name('export.pendaftaran');
+        Route::post('/pendaftaran/{id}/status', [AdminPendaftaranController::class, 'update'])->name('pendaftaran.updateStatus');
 
-        // APPROVE PENDAFTARAN
-        Route::post('pendaftaran/{pendaftaran}/approve', 
-            [AdminPendaftaranController::class, 'approve']
-        )->name('pendaftaran.approve');
-
-        // REJECT PENDAFTARAN
-        Route::post('pendaftaran/{pendaftaran}/reject', 
-            [AdminPendaftaranController::class, 'reject']
-        )->name('pendaftaran.reject');
-
-        // Export Excel
-        Route::get('/export/pendaftaran', [AdminExportController::class, 'export'])
-            ->name('export.pendaftaran');
-        Route::post('/pendaftaran/{id}/status', [AdminPendaftaranController::class, 'update'])
-        ->name('pendaftaran.updateStatus');
-
-        // Rute Tambahan untuk CRUD Konten Utama (Store, Update, Destroy)
+        /*
+        |--------------------------------------------------------------------------
+        | CRUD Konten Website (CMS)
+        |--------------------------------------------------------------------------
+        */
         Route::get('/konten', [AdminKontenController::class, 'index'])->name('konten.index');
+        
+        // >>>>>> INI BARIS PENTING YANG SEBELUMNYA HILANG <<<<<<
+        Route::get('/konten/json/{id}', [AdminKontenController::class, 'json'])->name('konten.json');
+        // >>>>>> --------------------------------------- <<<<<<
+
         Route::post('/konten/create', [AdminKontenController::class, 'store'])->name('konten.store');
         Route::put('/konten/{id}', [AdminKontenController::class, 'update'])->name('konten.update');
         Route::delete('/konten/{id}', [AdminKontenController::class, 'destroy'])->name('konten.destroy');
@@ -157,29 +132,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 
-
 /*
 |--------------------------------------------------------------------------
 | ROUTE TATA USAHA (TU)
 |--------------------------------------------------------------------------
 */
 Route::prefix('tu')->name('tu.')->group(function () {
-
-    // Guest TU
     Route::middleware('guest:tata_usaha')->group(function () {
-        Route::get('/login', [App\Http\Controllers\TataUsaha\AuthenticatedSessionController::class, 'create'])
-            ->name('login');
-
+        Route::get('/login', [App\Http\Controllers\TataUsaha\AuthenticatedSessionController::class, 'create'])->name('login');
         Route::post('/login', [App\Http\Controllers\TataUsaha\AuthenticatedSessionController::class, 'store']);
     });
 
-    // Authenticated TU
     Route::middleware('auth:tata_usaha')->group(function () {
-
-        Route::post('/logout', [App\Http\Controllers\TataUsaha\AuthenticatedSessionController::class, 'destroy'])
-            ->name('logout');
-
-        // Dashboard TU
+        Route::post('/logout', [App\Http\Controllers\TataUsaha\AuthenticatedSessionController::class, 'destroy'])->name('logout');
         Route::get('/dashboard', function () {
             return view('tu.dashboard');
         })->name('dashboard');

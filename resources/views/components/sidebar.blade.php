@@ -1,94 +1,98 @@
-<aside class="flex h-screen w-64 flex-col overflow-y-auto bg-white px-5 py-8">
+<aside class="flex h-screen w-64 flex-col overflow-y-auto bg-white px-5 py-6 border-r border-gray-100 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
 
-    <!-- LOGO / GAMBAR SUPER ADMIN -->
-    <div class="flex justify-center mb-6">
-        <img src="{{ asset('storage/logosd.png') }}" alt="Super Admin" class="w-70 h-12 ">
+    <div class="flex justify-center mb-8">
+        <img src="{{ asset('storage/logosd.png') }}" alt="Logo Sekolah" class="h-12 w-auto object-contain">
     </div>
 
-    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-x-4">
-        <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-700">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="h-7 w-7">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+    <a href="{{ route('admin.dashboard') }}" 
+       class="flex items-center gap-3 px-3 py-3 mb-6 rounded-2xl bg-gray-50 border border-gray-100 hover:border-indigo-100 hover:shadow-sm transition-all duration-300 group">
+        
+        <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-indigo-600 shadow-sm ring-1 ring-gray-100 group-hover:scale-105 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
             </svg>
         </span>
 
-        <div>
-            <h2 class="text-base font-semibold text-gray-800">
-                {{ Auth::guard('admin')->user()->nama ?? 'Super Admin' }}
+        <div class="flex flex-col">
+            <h2 class="text-sm font-bold text-gray-800 group-hover:text-indigo-700 transition-colors">
+                {{ Str::limit(Auth::guard('admin')->user()->nama ?? 'Super Admin', 15) }}
             </h2>
-            <p class="text-sm text-gray-500">Admin</p>
+            <p class="text-xs font-medium text-gray-400 group-hover:text-indigo-400 transition-colors">Administrator</p>
         </div>
     </a>
 
-    <div class="my-6 border-t border-gray-200"></div>
+    {{-- Catatan: Tidak pakai 'flex-1' agar menu tidak mendorong elemen bawah --}}
+    <nav class="flex flex-col space-y-1.5">
 
-    <div class="flex flex-1 flex-col justify-between">
-        <nav class="-mx-3 space-y-2">
-
-            {{-- Dashboard --}}
-            @php $isActive = request()->routeIs('admin.dashboard'); @endphp
-            <a class="flex transform items-center rounded-lg px-3 py-2 transition-colors duration-300
-                @if ($isActive) text-indigo-700 bg-indigo-50 font-semibold 
-                @else text-gray-500 hover:bg-gray-100 hover:text-gray-700 @endif" href="{{ route('admin.dashboard') }}"
-                @if ($isActive) aria-current="page" @endif>
-
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="h-5 w-5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-                </svg>
-
-                <span class="mx-4 text-sm font-medium">Dashboard</span>
-            </a>
-
-            {{-- Pendaftaran --}}
-            @php $isActive = request()->routeIs('admin.pendaftaran.index'); @endphp
-            <a class="flex transform items-center rounded-lg px-3 py-2 transition-colors duration-300
-                @if ($isActive) text-indigo-700 bg-indigo-50 font-semibold 
-                @else text-gray-500 hover:bg-gray-100 hover:text-gray-700 @endif"
-                href="{{ route('admin.pendaftaran.index') }}" @if ($isActive) aria-current="page" @endif>
-
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
-                    <path
-                        d="M18.375 2.25c-1.035 0-1.875.84-1.875 1.875v15.75c0 1.035.84 1.875 1.875 1.875h.75c1.035 0 1.875-.84 1.875-1.875V4.125c0-1.035-.84-1.875-1.875-1.875h-.75zM9.75 8.625c-1.035 0-1.875.84-1.875 1.875v11.25c0 1.035.84 1.875 1.875 1.875h.75c1.035 0 1.875-.84 1.875-1.875V10.5c0-1.035-.84-1.875-1.875-1.875h-.75zM3 15.375c-1.035 0-1.875.84-1.875 1.875v4.5c0 1.035.84 1.875 1.875 1.875h.75c1.035 0 1.875-.84 1.875-1.875v-4.5c0-1.035-.84-1.875-1.875-1.875H3z" />
-                </svg>
-
-                <span class="mx-4 text-sm font-medium">Pendaftaran</span>
-            </a>
-
-            {{-- Konten --}}
-            @php $isActive = request()->routeIs('admin.konten.index*'); @endphp
-            <a class="flex transform items-center rounded-lg px-3 py-2 transition duration-300
-                @if ($isActive) text-indigo-700 bg-indigo-50 font-semibold 
-                @else text-gray-500 hover:bg-gray-100 hover:text-gray-700 @endif"
-                href="{{ route('admin.konten.index') }}" @if ($isActive) aria-current="page" @endif>
-
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="h-5 w-5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 18.257V21.75H14.25l10.435-10.435zM16.862 4.487l1.688 1.688M10.582 18.257v-2.652a1.875 1.875 0 011.875-1.875h2.652" />
-                </svg>
-
-                <span class="mx-4 text-sm font-medium">Konten</span>
-            </a>
-
-        </nav>
-
-        <a href="#" id="logoutButton"
-            class="flex transform items-center rounded-lg px-3 py-2 text-gray-500 transition-colors duration-300 hover:bg-red-100 hover:text-red-700">
-
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="h-5 w-5">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+        {{-- Dashboard --}}
+        @php $isActive = request()->routeIs('admin.dashboard'); @endphp
+        <a href="{{ route('admin.dashboard') }}"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+           @if ($isActive) 
+               bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100
+           @else 
+               text-gray-500 font-medium hover:bg-gray-50 hover:text-gray-900 
+           @endif">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="{{ $isActive ? '2' : '1.5' }}" stroke="currentColor" 
+                 class="h-5 w-5 transition-colors {{ $isActive ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600' }}">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
             </svg>
-
-            <span class="mx-4 text-sm font-medium">Logout</span>
+            <span>Dashboard</span>
         </a>
 
+        {{-- Pendaftaran --}}
+        @php $isActive = request()->routeIs('admin.pendaftaran.index'); @endphp
+        <a href="{{ route('admin.pendaftaran.index') }}"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+           @if ($isActive) 
+               bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100
+           @else 
+               text-gray-500 font-medium hover:bg-gray-50 hover:text-gray-900 
+           @endif">
+
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="{{ $isActive ? '2' : '1.5' }}" stroke="currentColor" 
+                 class="h-5 w-5 transition-colors {{ $isActive ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600' }}">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+            </svg>
+            <span>Pendaftaran</span>
+        </a>
+
+        {{-- Konten --}}
+        @php $isActive = request()->routeIs('admin.konten.index*'); @endphp
+        <a href="{{ route('admin.konten.index') }}"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+           @if ($isActive) 
+               bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100
+           @else 
+               text-gray-500 font-medium hover:bg-gray-50 hover:text-gray-900 
+           @endif">
+
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="{{ $isActive ? '2' : '1.5' }}" stroke="currentColor" 
+                 class="h-5 w-5 transition-colors {{ $isActive ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600' }}">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+            </svg>
+            <span>Konten</span>
+        </a>
+
+    </nav>
+
+    <div class="mt-2">
+        {{-- Garis Pemisah --}}
+        <div class="my-2 border-t border-gray-100"></div>
+
+        {{-- Tombol Logout (Desain Baru) --}}
+        <a href="#" id="logoutButton"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 font-medium transition-all duration-200 hover:bg-rose-50 hover:text-rose-600 hover:shadow-sm group">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+                 class="h-5 w-5 text-gray-400 group-hover:text-rose-500 transition-colors">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+            </svg>
+            <span>Logout</span>
+        </a>
     </div>
+
     @auth
         @vite('resources/js/logout.js')
     @endauth

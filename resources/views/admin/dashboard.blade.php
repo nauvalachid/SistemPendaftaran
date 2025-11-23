@@ -6,7 +6,7 @@
 <div class="flex min-h-screen bg-white">
     <x-sidebar />
 
-    <main class="w-full overflow-y-auto p-8 lg:p-12">
+    <main class="w-full overflow-y-auto p-6 lg:p-6">
         <div>
             <h1 class="text-3xl font-bold text-black">Dashboard {{ Auth::guard('admin')->user()->nama ?? 'Admin' }}</h1>
             <p class="mt-2 text-black">Selamat datang di Dashboard Admin!</p>
