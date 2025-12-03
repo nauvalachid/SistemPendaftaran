@@ -14,6 +14,7 @@ class Konten extends Model
     protected $fillable = [
         'kategori_konten_id',
         'judul',
+        'sub_judul',
         'isi',
         'urutan',
     ];

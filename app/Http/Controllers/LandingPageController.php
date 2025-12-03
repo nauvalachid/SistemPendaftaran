@@ -12,79 +12,42 @@ class LandingPageController extends Controller
      */
     public function index()
     {
-        // 1. Ambil konten untuk bagian Beranda (Hero Section).
+        // 1. Beranda (Tetap ambil 1 foto utama)
         $berandaContent = KategoriKonten::where('nama', 'Beranda') 
-            ->with(['konten' => function ($query) {
-                $query->orderBy('urutan', 'asc')->limit(1);
-            }, 'konten.media' => function ($query) {
-                $query->orderBy('urutan', 'asc');
-            }])
+            ->with(['konten.media' => function ($query) { $query->orderBy('urutan', 'asc'); }])
             ->first();
-            
-        $kontenBeranda = $berandaContent && $berandaContent->konten->isNotEmpty() 
-                             ? $berandaContent->konten->first() 
-                             : null;
+        $kontenBeranda = $berandaContent && $berandaContent->konten->isNotEmpty() ? $berandaContent->konten->first() : null;
         
-        // 2. Ambil konten untuk bagian Tentang Sekolah (Sejarah, Visi, Misi).
-        $tentangSekolahContent = KategoriKonten::where('nama', 'Tentang Sekolah')
-            ->with(['konten' => function ($query) {
-                $query->orderBy('urutan', 'asc');
-            }])
-            ->first();
+        // 2. Tentang Sekolah (Tetap)
+        $tentangSekolahContent = KategoriKonten::where('nama', 'Tentang Sekolah')->with('konten')->first();
+        $kontenTentangSekolah = $tentangSekolahContent ? $tentangSekolahContent->konten : collect();
 
-        $kontenTentangSekolah = $tentangSekolahContent
-                                ? $tentangSekolahContent->konten 
-                                : collect();
+        // 3. PPDB (Tetap ambil 1 foto utama jika ada)
+        $ppdbContent = KategoriKonten::where('nama', 'LIKE', '%PPDB%')->with('konten')->first();
+        $kontenPPDB = $ppdbContent && $ppdbContent->konten->isNotEmpty() ? $ppdbContent->konten->first() : null;
 
-        // 3. Ambil konten untuk bagian PPDB (Penerimaan Peserta Didik Baru).
-        // Kita asumsikan PPDB adalah konten tunggal (seperti Beranda).
-        $ppdbContent = KategoriKonten::where('nama', 'PPDB')
-            ->with(['konten' => function ($query) {
-                $query->orderBy('urutan', 'asc')->limit(1);
-            }])
-            ->first();
-
-        $kontenPPDB = $ppdbContent && $ppdbContent->konten->isNotEmpty()
-                                ? $ppdbContent->konten->first()
-                                : null;
-
-        // 4. Ambil konten untuk bagian Tenaga Pengajar (Daftar Guru).
-        // Kita asumsikan Tenaga Pengajar adalah koleksi item.
+        // 4. Tenaga Pengajar (Tetap ambil 1 foto utama per guru)
         $tenagaPengajarContent = KategoriKonten::where('nama', 'Tenaga Pengajar')
-            ->with(['konten' => function ($query) {
-                $query->orderBy('urutan', 'asc');
-            }, 'konten.media' => function ($query) {
-                // Preload media utama untuk foto guru
-                $query->where('urutan', 0)->limit(1);
-            }])
+            ->with(['konten.media' => function ($query) { $query->where('urutan', 0); }]) // Ambil foto profil saja
             ->first();
+        $kontenTenagaPengajar = $tenagaPengajarContent ? $tenagaPengajarContent->konten : collect();
 
-        $kontenTenagaPengajar = $tenagaPengajarContent
-                                ? $tenagaPengajarContent->konten 
-                                : collect();
-
-        // 5. Ambil konten untuk bagian Ekstrakurikuler.
-        // Kita asumsikan Ekstrakurikuler adalah koleksi item.
+        // =================================================================
+        // 5. PERBAIKAN DI SINI (EKSTRAKURIKULER)
+        // =================================================================
         $ekstrakurikulerContent = KategoriKonten::where('nama', 'Ekstrakurikuler')
             ->with(['konten' => function ($query) {
                 $query->orderBy('urutan', 'asc');
             }, 'konten.media' => function ($query) {
-                // Preload media utama untuk gambar ekstrakurikuler
-                $query->where('urutan', 0)->limit(1);
+                $query->orderBy('urutan', 'asc'); 
+                // HAPUS limit(1) dan where('urutan', 0) AGAR SEMUA FOTO DIAMBIL
             }])
             ->first();
 
-        $kontenEkstrakurikuler = $ekstrakurikulerContent
-                                ? $ekstrakurikulerContent->konten 
-                                : collect();
+        $kontenEkstrakurikuler = $ekstrakurikulerContent ? $ekstrakurikulerContent->konten : collect();
 
-        // 6. Kirim semua variabel ke View.
         return view('welcome', compact(
-            'kontenBeranda', 
-            'kontenTentangSekolah', 
-            'kontenPPDB', 
-            'kontenTenagaPengajar', 
-            'kontenEkstrakurikuler' // <-- Tambahan variabel baru
+            'kontenBeranda', 'kontenTentangSekolah', 'kontenPPDB', 'kontenTenagaPengajar', 'kontenEkstrakurikuler'
         ));
     }
 }
