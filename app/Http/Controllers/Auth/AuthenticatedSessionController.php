@@ -31,7 +31,7 @@ class AuthenticatedSessionController extends Controller
    /**
      * Handle an incoming authentication request (Final Version).
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request)
     {
         $credentials = $request->only('email', 'password');
         $remember = $request->boolean('remember');

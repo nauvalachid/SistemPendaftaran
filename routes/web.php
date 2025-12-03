@@ -64,8 +64,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/pendaftaran/{pendaftaran}', [PendaftaranController::class, 'show'])
         ->name('pendaftaran.show');
 
-    // Route::get('/create', [PendaftaranController::class, 'create'])
-    //     ->name('pendaftaran.create');
+    Route::get('/create', [PendaftaranController::class, 'create'])
+        ->name('pendaftaran.create');
 
     Route::post('/store', [PendaftaranController::class, 'store'])
         ->name('pendaftaran.store');

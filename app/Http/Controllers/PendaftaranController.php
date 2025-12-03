@@ -21,42 +21,40 @@ class PendaftaranController extends Controller
 
     public function index(Request $request)
     {
-        // Cek apakah pengguna sudah login (untuk otorisasi rute, jika perlu)
-        // Walaupun user login, kita TIDAK akan menampilkan status mereka secara default.
-
+        $pendaftaran = null; // Gunakan satu variabel konsisten untuk data yang akan dikirim ke view
         $searchTerm = $request->input('search');
-        $pendaftaran_search = null;
 
-        if ($searchTerm) {
-            // HANYA cari berdasarkan nama_siswa menggunakan LIKE
-            // Ambil satu hasil yang paling cocok/pertama ditemukan.
-            $pendaftaran_search = Pendaftaran::where('nama_siswa', 'like', '%' . $searchTerm . '%')->first();
-
-            // JIKA PENDAFTARAN DITEMUKAN:
-            // Kembalikan view status dengan data hasil pencarian
-            return view('pendaftaran.status', [
-                'pendaftaran_search' => $pendaftaran_search,
-                'searchTerm' => $searchTerm
-            ]);
-        }
-
-        // JIKA TIDAK ADA PENCARIAN (Akses Awal ke /pendaftaran)
-        // Cek status login hanya untuk menentukan apakah harus diarahkan ke formulir
+        // 1. Cek apakah ada pengguna yang sedang login
         if (Auth::check()) {
+            // Coba ambil data pendaftaran berdasarkan ID pengguna yang login
             $pendaftaran_user = Pendaftaran::where('id_user', Auth::id())->first();
 
+            // Jika pengguna login dan sudah mendaftar, set data ini sebagai data default
             if ($pendaftaran_user) {
-                // Jika user sudah login dan mendaftar: Arahkan mereka ke halaman status
-                // dan biarkan mereka mencari. (Alternatif: arahkan ke dashboard/menu)
-                // Untuk skenario ini, kita biarkan mereka di halaman status dengan hasil NULL.
+                $pendaftaran = $pendaftaran_user;
             } else {
-                // Jika user login tapi belum mendaftar, arahkan ke formulir.
-                return redirect()->route('pendaftaran.create');
+                // Jika pengguna login tapi belum mendaftar DAN tidak sedang mencari, arahkan ke formulir
+                if (!$searchTerm) {
+                    return redirect()->route('pendaftaran.create');
+                }
             }
         }
 
-        // Default: Tampilkan halaman status (hanya search bar dan cards)
-        return view('pendaftaran.status', compact('pendaftaran_search', 'searchTerm'));
+        // 2. Handle Pencarian (Jika ada search term, ini akan menimpa/menggantikan data yang dilihat)
+        if ($searchTerm) {
+            // Cari berdasarkan nama_siswa menggunakan LIKE
+            $pendaftaran_search = Pendaftaran::where('nama_siswa', 'like', '%' . $searchTerm . '%')->first();
+            
+            // Timpa $pendaftaran dengan hasil pencarian jika ditemukan (untuk display hasil search)
+            $pendaftaran = $pendaftaran_search;
+        }
+
+        // 3. Kirim view dengan data yang sudah dikonsolidasikan
+        // Variabel yang dikirim adalah $pendaftaran, sesuai dengan yang diharapkan oleh resources/views/ppdb/status.blade.php
+        return view('pendaftaran.status', [
+            'pendaftaran' => $pendaftaran,
+            'searchTerm' => $searchTerm
+        ]);
     }
 
     /**
