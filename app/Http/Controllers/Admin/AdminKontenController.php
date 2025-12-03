@@ -61,6 +61,7 @@ class AdminKontenController extends Controller
         $validated = $request->validate([
             'kategori_konten_id' => 'required|exists:kategori_konten,id',
             'judul' => 'required|string|max:255',
+            'sub_judul' => 'nullable|string|max:255',
             'isi' => 'required|string',
             'file_utama' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048', 
         ]);
@@ -70,6 +71,7 @@ class AdminKontenController extends Controller
         $konten = Konten::create([
             'kategori_konten_id' => $validated['kategori_konten_id'],
             'judul' => $validated['judul'],
+            'sub_judul' => $validated['sub_judul'] ?? null,
             'isi' => $validated['isi'],
             'urutan' => $urutan_baru,
         ]);
@@ -99,12 +101,14 @@ class AdminKontenController extends Controller
 
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
+            'sub_judul' => 'nullable|string|max:255',
             'isi' => 'required|string',
             'file_utama' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048', 
         ]);
 
         $konten->update([
             'judul' => $validated['judul'],
+            'sub_judul' => $validated['sub_judul'] ?? null,
             'isi' => $validated['isi'],
         ]);
 

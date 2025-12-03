@@ -1,0 +1,12 @@
+/* Jangan pakai titik (.) agar langsung nembak ke tag HTML/Body */
+
+/* Chrome, Safari, Opera */
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+    display: none;
+}
+
+/* IE, Edge, Firefox */
+html, body {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
