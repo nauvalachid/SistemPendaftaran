@@ -8,6 +8,8 @@ export default defineConfig({
                 'resources/css/app.css', 
                 'resources/js/app.js',
                 'resources/js/logout.js',
+                'resources/js/pendaftaran-script.js', 
+                'resources/js/pendaftaran-action.js',
             ],
             refresh: true,
         }),

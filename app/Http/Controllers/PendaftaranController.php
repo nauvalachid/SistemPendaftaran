@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class PendaftaranController extends Controller
 {
@@ -44,7 +46,7 @@ class PendaftaranController extends Controller
         if ($searchTerm) {
             // Cari berdasarkan nama_siswa menggunakan LIKE
             $pendaftaran_search = Pendaftaran::where('nama_siswa', 'like', '%' . $searchTerm . '%')->first();
-            
+
             // Timpa $pendaftaran dengan hasil pencarian jika ditemukan (untuk display hasil search)
             $pendaftaran = $pendaftaran_search;
         }
@@ -242,4 +244,27 @@ class PendaftaranController extends Controller
             ARRAY_FILTER_USE_KEY
         );
     }
+
+    public function exportPdf($id)
+    {
+        $pendaftaran = Pendaftaran::findOrFail($id);
+
+        // Keamanan: hanya pemilik data yang boleh mengunduh PDF
+        if (Auth::id() !== $pendaftaran->id_user) {
+            return redirect('/dashboard')->with('error', 'Anda tidak memiliki akses ke data ini.');
+        }
+
+        $pdf = PDF::loadView('pendaftaran.bukti-pdf', compact('pendaftaran'))
+            ->setPaper('A4', 'portrait');
+
+        return $pdf->download('bukti-pendaftaran-' . $pendaftaran->nama_siswa . '.pdf');
+    }
+
+    public function previewPdf($id)
+    {
+        $pendaftaran = Pendaftaran::findOrFail($id);
+
+        return view('pendaftaran.bukti-pdf', compact('pendaftaran'));
+    }
+
 }

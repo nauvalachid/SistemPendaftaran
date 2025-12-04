@@ -6,6 +6,9 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>SD Muhammadiyah 2 Ambarketawang</title>
 
+        {{-- Wajib: Tambahkan Swiper CSS (CDN) untuk slider Tenaga Pengajar --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
         {{-- Load CSS & JS Laravel --}}
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
@@ -170,23 +173,67 @@
                 </div>
             </section>
 
-            {{-- 4. PPDB --}}
-            @if($kontenPPDB)
-            <section id="ppdb" class="py-20 lg:py-24 bg-blue-50 relative overflow-hidden">
-                <div class="max-w-4xl mx-auto px-6 lg:px-8 relative z-10 text-center">
-                    <span class="inline-block py-1 px-3 rounded-full bg-blue-100 text-blue-700 text-sm font-bold tracking-wide uppercase mb-6 border border-blue-200">Penerimaan Peserta Didik Baru</span>
-                    <h2 class="text-3xl md:text-5xl font-extrabold text-black mb-4 leading-tight">{!! nl2br(e($kontenPPDB->judul)) !!}</h2>
-                    @if(isset($kontenPPDB->sub_judul) && $kontenPPDB->sub_judul)
-                        <h3 class="text-xl md:text-2xl font-bold text-blue-700 mb-8">{{ $kontenPPDB->sub_judul }}</h3>
-                    @endif
-                    <div class="prose prose-lg mx-auto text-gray-700 mb-10 leading-relaxed"><p>{!! nl2br(e($kontenPPDB->isi)) !!}</p></div>
-                    <div class="flex flex-col sm:flex-row justify-center gap-4">
-                        <a href="/pendaftaran" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white transition-all duration-200 bg-[#003366] border border-transparent rounded-xl hover:bg-blue-900 shadow-lg hover:shadow-xl transform hover:-translate-y-1">Daftar Sekarang</a>
-                        <a href="#kontak" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-[#003366] transition-all duration-200 bg-white border-2 border-[#003366] rounded-xl hover:bg-blue-50 shadow-sm hover:shadow-md">Hubungi Kami</a>
-                    </div>
-                </div>
-            </section>
+           {{-- 4. PPDB --}}
+@if($kontenPPDB)
+<section id="ppdb" class="py-20 bg-white relative overflow-hidden">
+    <div class="max-w-6xl mx-auto px-6 lg:px-8 relative z-10">
+        
+        {{-- HEADER: Judul dan Subjudul (Tengah) --}}
+        <div class="text-center mb-12 lg:mb-16">
+            <h2 class="text-2xl md:text-3xl font-extrabold text-black mb-2">
+                {!! nl2br(e($kontenPPDB->judul)) !!}
+            </h2>
+            @if(isset($kontenPPDB->sub_judul) && $kontenPPDB->sub_judul)
+                <h3 class="text-xl md:text-2xl font-bold text-black">
+                    {{ $kontenPPDB->sub_judul }}
+                </h3>
             @endif
+        </div>
+
+        {{-- KONTEN UTAMA: Grid 2 Kolom --}}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            
+            {{-- KOLOM KIRI: Teks Ajakan & Tombol --}}
+            <div class="flex flex-col items-start text-left">
+                <h4 class="text-2xl md:text-3xl font-bold text-[#002060] mb-6 leading-tight">
+                    Ayo bergabung dengan kami!
+                </h4>
+                
+                <a href="/pendaftaran" 
+                   class="inline-flex items-center justify-center px-8 py-3 text-base font-bold text-white transition-all duration-200 bg-[#002060] rounded-xl hover:bg-blue-900 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    Daftar Sekarang
+                </a>
+            </div>
+
+            {{-- KOLOM KANAN: Kartu Syarat Pendaftaran --}}
+            <div class="bg-white p-8 rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.08)] border border-gray-100">
+                <h5 class="text-xl font-bold text-black mb-4">Syarat Pendaftaran :</h5>
+                
+                {{-- List Syarat (Dibuat Hardcode agar rapi sesuai gambar) --}}
+                <ol class="list-decimal list-outside ml-5 space-y-3 text-gray-800 font-medium">
+                    <li>Mengisi formulir pendaftaran.</li>
+                    <li>
+                        Melengkapi berkas :
+                        <ul class="list-disc list-outside ml-5 mt-1 space-y-1 text-gray-700">
+                            <li>Kartu Keluarga;</li>
+                            <li>Akte Kelahiran;</li>
+                            <li>Ijazah TK (Jika Ada);</li>
+                            <li>Pas Foto.</li>
+                        </ul>
+                    </li>
+                    <li>Melakukan pembayaran administrasi.</li>
+                </ol>
+                
+                {{-- OPSI: Jika ingin tetap menampilkan teks dari database di bawah list hardcode, hapus komentar di bawah ini --}}
+                {{-- <div class="mt-4 prose prose-sm text-gray-600">
+                    {!! nl2br(e($kontenPPDB->isi)) !!}
+                </div> --}}
+            </div>
+
+        </div>
+    </div>
+</section>
+@endif
             
         </div>
 

@@ -27,17 +27,23 @@
         {{-- Dashboard --}}
         @php $isActive = request()->routeIs('admin.dashboard'); @endphp
         <a href="{{ route('admin.dashboard') }}"
-           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
-           @if ($isActive) 
-               bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100
-           @else 
-               text-gray-500 font-medium hover:bg-gray-50 hover:text-gray-900 
-           @endif">
+            class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+            @if ($isActive) 
+                {{-- Warna Latar dan Teks Tautan Saat Aktif --}}
+                bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100
+            @else 
+                {{-- Warna Teks Tautan Default --}}
+                text-gray-500 font-medium hover:bg-gray-50 hover:text-gray-900 
+            @endif">
             
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="{{ $isActive ? '2' : '1.5' }}" stroke="currentColor" 
-                 class="h-5 w-5 transition-colors {{ $isActive ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600' }}">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-            </svg>
+            {{-- MENGGUNAKAN IMPORT DARI public/icons/dashboard.svg --}}
+            <img src="{{ asset('icons/dashboard.svg') }}" alt="Dashboard Icon"
+                class="h-5 w-5 transition-colors 
+                
+                {{-- Kelas ini akan mewarnai SVG hanya jika SVG menggunakan currentColor --}}
+                text-gray-700 group-hover:text-gray-900" 
+            >
+            
             <span>Dashboard</span>
         </a>
 

@@ -77,19 +77,20 @@
                 </div>
 
                 {{-- Tombol Unduh Bukti --}}
-                @if(($pendaftaran->status ?? 'Pending') == 'diterima')
-                    <a href="#"
+                @if(($pendaftaran->status ?? 'Pending') == 'Diterima')
+                    <a href="{{ route('pendaftaran.pdf', $pendaftaran->id_pendaftaran) }}"
                         class="inline-flex items-center mt-6 px-4 py-3 bg-blue-800 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150">
+
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                         </svg>
+
                         Unduh Bukti Pendaftaran
                     </a>
                 @endif
             </div>
-
         @else
             {{-- TAMPILAN JIKA PENGGUNA SUDAH LOGIN TAPI DATA PENDAFTARANNYA BELUM ADA --}}
             <div
