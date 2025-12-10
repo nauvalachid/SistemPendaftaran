@@ -2,28 +2,29 @@
 
     <h1 class="text-3xl font-bold text-gray-800 text-center mb-1">Sign In</h1>
 
-    <p class="text-sm text-gray-500 text-center mb-6">Silahkan masukkan email dan password untuk masuk!</p>
+    <p class="text-sm text-gray-500 text-center mb-6">Silahkan masukkan username dan password untuk masuk!</p>
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <!-- Menggunakan url()->current() agar form action sesuai dengan route yang diakses (e.g., /admin/login) -->
     <form method="POST" action="{{ url()->current() }}">
         @csrf
 
         <div class="mb-4">
-            <x-input-label for="email" :value="__('Email')" class="text-sm font-medium text-gray-700" />
-            <x-text-input id="email" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm placeholder-gray-400" 
-                          type="email" 
-                          name="email" 
-                          :value="old('email')" 
+            <x-input-label for="username" :value="__('Username')" class="text-sm font-medium text-gray-700" />
+            
+            <x-text-input id="username" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm placeholder-gray-400" 
+                          type="text" 
+                          name="username" 
+                          :value="old('username')" 
                           required autofocus autocomplete="username" 
-                          placeholder="Masukkan Email" 
+                          placeholder="Masukkan Username" 
             />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <x-input-error :messages="$errors->get('username')" class="mt-2" />
         </div>
 
         <div class="mb-6">
             <x-input-label for="password" :value="__('Password')" class="text-sm font-medium text-gray-700" />
+            
             <x-text-input id="password" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm placeholder-gray-400"
                           type="password"
                           name="password"

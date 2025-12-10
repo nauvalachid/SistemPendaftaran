@@ -80,7 +80,6 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/auth.php';
 
-
 /*
 |--------------------------------------------------------------------------
 | ROUTE ADMIN (Multi-Auth)
@@ -88,16 +87,8 @@ require __DIR__ . '/auth.php';
 */
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    // Guest (Login Admin)
-    Route::middleware('guest:admin')->group(function () {
-        Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])->name('login');
-        Route::post('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'store']);
-    });
-
     // Authenticated Admin
     Route::middleware('auth:admin')->group(function () {
-
-        Route::post('/logout', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
         // Dashboard Admin
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
