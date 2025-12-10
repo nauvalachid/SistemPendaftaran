@@ -15,6 +15,8 @@
     <main class="w-full overflow-y-auto p-6 md:p-6">
         
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+        {{-- Pastikan ada meta tag CSRF untuk AJAX --}}
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <div class="max-w-7xl mx-auto">
             
@@ -28,10 +30,14 @@
                 <h2 class="text-xl font-semibold text-black">Daftar Pendaftar</h2>
                 
                 <a href="{{ route('admin.export.pendaftaran') }}"
-                   class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-sm transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
+                    class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-sm transition">
+                    
+                    {{-- MENGGUNAKAN IMPORT DARI public/icons/export-excel.svg (Misalnya) --}}
+                    {{-- GANTI `export-excel.svg` dengan nama file ikon yang sesuai di folder public/icons Anda --}}
+                    <img src="{{ asset('icons/export.svg') }}" alt="Export Excel Icon"
+                        class="h-5 w-5" 
+                    >
+                    
                     Ekspor Excel
                 </a>
             </div>
@@ -44,8 +50,8 @@
                     <div class="flex-1 min-w-[200px] max-w-3xl relative">
                         <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                         <input type="text" name="search" placeholder="Cari nama atau NISN..."
-                               value="{{ request('search') }}"
-                               class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 bg-white focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
+                                value="{{ request('search') }}"
+                                class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 bg-white focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
                     </div>
 
                     {{-- 2. CUSTOM DROPDOWN STATUS --}}
@@ -65,7 +71,7 @@
                             </div>
                             @foreach ($list_status as $status)
                                 <div class="custom-select-option {{ request('status') == $status ? 'selected' : '' }}" 
-                                     data-value="{{ $status }}">
+                                    data-value="{{ $status }}">
                                     {{ ucfirst($status) }}
                                 </div>
                             @endforeach
@@ -89,7 +95,7 @@
                             </div>
                             @foreach ($list_sekolah as $sekolah)
                                 <div class="custom-select-option {{ request('asal_sekolah') == $sekolah ? 'selected' : '' }}" 
-                                     data-value="{{ $sekolah }}">
+                                    data-value="{{ $sekolah }}">
                                     {{ $sekolah }}
                                 </div>
                             @endforeach
@@ -220,88 +226,7 @@
     </main>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- LOGIKA UNTUK CUSTOM DROPDOWN ---
-        const dropdowns = document.querySelectorAll('.custom-select-container');
-
-        dropdowns.forEach(dropdown => {
-            const trigger = dropdown.querySelector('.custom-select-trigger');
-            const hiddenInput = dropdown.querySelector('input[type="hidden"]');
-            const options = dropdown.querySelectorAll('.custom-select-option');
-
-            trigger.addEventListener('click', (e) => {
-                dropdowns.forEach(other => { if (other !== dropdown) other.classList.remove('open'); });
-                dropdown.classList.toggle('open');
-                e.stopPropagation();
-            });
-
-            options.forEach(option => {
-                option.addEventListener('click', (e) => {
-                    const value = option.getAttribute('data-value');
-                    const text = option.innerText;
-                    trigger.querySelector('span').innerText = text;
-                    hiddenInput.value = value;
-                    dropdown.classList.remove('open');
-                    options.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    document.getElementById('filterForm').submit();
-                    e.stopPropagation();
-                });
-            });
-        });
-
-        window.addEventListener('click', () => {
-            dropdowns.forEach(dropdown => dropdown.classList.remove('open'));
-        });
-
-
-        // --- LOGIKA SORTING & ACTION ---
-        const form = document.getElementById('filterForm');
-        const hiddenSortBy = document.getElementById('hiddenSortBy');
-
-        document.getElementById('toggleSortNama')?.addEventListener('click', () => {
-            const current = hiddenSortBy.value;
-            hiddenSortBy.value = (current === 'nama_asc') ? 'nama_desc' : 'nama_asc';
-            form.submit();
-        });
-
-        document.getElementById('toggleSortTanggal')?.addEventListener('click', () => {
-            const current = hiddenSortBy.value;
-            hiddenSortBy.value = (current === 'tanggal_desc') ? 'tanggal_asc' : 'tanggal_desc';
-            form.submit();
-        });
-    });
-
-    function handleAction(btn, url, type) {
-        if (btn.disabled) return;
-        const label = type === 'setuju' ? 'Menerima' : 'Menolak';
-        if (!confirm(`Anda yakin ingin ${label} pendaftar ini?`)) return;
-
-        const originalContent = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) window.location.reload();
-            else { alert('Gagal: ' + data.message); btn.disabled = false; btn.innerHTML = originalContent; }
-        })
-        .catch(err => {
-            console.error(err);
-            alert('Terjadi kesalahan server.');
-            btn.disabled = false;
-            btn.innerHTML = originalContent;
-        });
-    }
-</script>
+{{-- Memuat file JavaScript yang sudah dipisahkan --}}
+@vite(['resources/js/pendaftaran-script.js', 'resources/js/pendaftaran-action.js'])
 
 @endsection

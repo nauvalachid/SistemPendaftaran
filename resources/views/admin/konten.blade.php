@@ -213,7 +213,9 @@
                                     </div>
                                     @if ($foto_utama)
                                     <div class="w-full md:w-1/3 flex-shrink-0">
-                                        <img src="{{ asset('storage/' . $foto_utama->file_path) }}" class="w-full h-48 object-cover rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition transform hover:scale-[1.02]">
+                                        {{-- FIX: object-cover diganti menjadi object-contain agar foto tidak terpotong --}}
+                                        <img src="{{ asset('storage/' . $foto_utama->file_path) }}" 
+                                            class="w-full h-48 object-contain rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition transform hover:scale-[1.02]">
                                     </div>
                                     @endif
                                 </div>

@@ -69,6 +69,13 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/store', [PendaftaranController::class, 'store'])
         ->name('pendaftaran.store');
+
+    Route::get('/pendaftaran/{id}/export-pdf', [PendaftaranController::class, 'exportPdf'])
+        ->name('pendaftaran.pdf');
+
+    Route::get('/pendaftaran/{id}/preview', [PendaftaranController::class, 'previewPdf'])
+        ->name('pendaftaran.previewPdf');
+
 });
 
 require __DIR__ . '/auth.php';
@@ -107,7 +114,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         |--------------------------------------------------------------------------
         */
         Route::get('/konten', [AdminKontenController::class, 'index'])->name('konten.index');
-        
+
         // >>>>>> INI BARIS PENTING YANG SEBELUMNYA HILANG <<<<<<
         Route::get('/konten/json/{id}', [AdminKontenController::class, 'json'])->name('konten.json');
         // >>>>>> --------------------------------------- <<<<<<
