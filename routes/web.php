@@ -64,15 +64,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/pendaftaran/{pendaftaran}', [PendaftaranController::class, 'show'])
         ->name('pendaftaran.show');
 
-    // Route::get('/create', [PendaftaranController::class, 'create'])
-    //     ->name('pendaftaran.create');
+    Route::get('/create', [PendaftaranController::class, 'create'])
+        ->name('pendaftaran.create');
 
     Route::post('/store', [PendaftaranController::class, 'store'])
         ->name('pendaftaran.store');
 });
 
 require __DIR__ . '/auth.php';
-
 
 /*
 |--------------------------------------------------------------------------
@@ -81,16 +80,8 @@ require __DIR__ . '/auth.php';
 */
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    // Guest (Login Admin)
-    Route::middleware('guest:admin')->group(function () {
-        Route::get('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'create'])->name('login');
-        Route::post('/login', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'store']);
-    });
-
     // Authenticated Admin
     Route::middleware('auth:admin')->group(function () {
-
-        Route::post('/logout', [App\Http\Controllers\Admin\AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
         // Dashboard Admin
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
