@@ -525,7 +525,6 @@
                     modalTitle.innerText = 'Edit Ekstrakurikuler';
                     labelJudul.innerText = 'Nama Ekstrakurikuler';
                     labelIsi.innerText = 'Deskripsi';
-                    editFotoGroup.classList.add('hidden'); 
                 
                 } else if (kategoriNama.includes('tentang sekolah')) {
                     modalTitle.innerText = 'Edit Tentang Sekolah';
@@ -538,7 +537,6 @@
                     modalTitle.innerText = 'Edit Tenaga Pengajar';
                     labelJudul.innerText = 'Nama Guru';
                     labelIsi.innerText = 'Jabatan';
-                    editFotoGroup.classList.add('hidden');
 
                 } else if (kategoriNama.includes('ppdb')) {
                     modalTitle.innerText = 'Edit Informasi PPDB';

@@ -115,38 +115,44 @@ class AdminPendaftaranController extends Controller
  * Approve pendaftaran
  */
 public function approve(Pendaftaran $pendaftaran)
-{
-    $pendaftaran->status = 'diterima'; // gunakan lowercase untuk konsisten
-    $pendaftaran->save();
+    {
+        // 1. Set ID Admin yang melakukan perubahan
+        $pendaftaran->id_admin = Auth::id(); // Ambil ID pengguna (Admin) yang sedang login
+        
+        $pendaftaran->status = 'diterima'; 
+        $pendaftaran->save();
 
-    return response()->json([
-        'success' => true,
-        'status' => 'diterima'
-    ]);
-}
-
-/**
- * Reject pendaftaran
- */
-public function reject(Pendaftaran $pendaftaran, Request $request)
-{
-    $request->validate([
-        'alasan' => 'nullable|string'
-    ]);
-
-    $pendaftaran->status = 'ditolak';
-
-    if ($request->filled('alasan')) {
-        $pendaftaran->alasan = $request->alasan;
+        return response()->json([
+            'success' => true,
+            'status' => 'diterima'
+        ]);
     }
 
-    $pendaftaran->save();
+    /**
+     * Reject pendaftaran
+     */
+    public function reject(Pendaftaran $pendaftaran, Request $request)
+    {
+        $request->validate([
+            'alasan' => 'nullable|string'
+        ]);
 
-    return response()->json([
-        'success' => true,
-        'status' => 'ditolak'
-    ]);
-}
+        // 1. Set ID Admin yang melakukan perubahan
+        $pendaftaran->id_admin = Auth::id(); // Ambil ID pengguna (Admin) yang sedang login
+        
+        $pendaftaran->status = 'ditolak';
+
+        if ($request->filled('alasan')) {
+            $pendaftaran->alasan = $request->alasan;
+        }
+
+        $pendaftaran->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => 'ditolak'
+        ]);
+    }
 
 
     /**
@@ -159,6 +165,13 @@ public function reject(Pendaftaran $pendaftaran, Request $request)
         ]);
 
         $pendaftaran = Pendaftaran::findOrFail($id);
+        
+        // Cek jika status berubah (atau jika tidak ingin mencatat admin saat status tetap 'Pending')
+        if ($pendaftaran->status !== $validated['status']) {
+             // 1. Set ID Admin yang melakukan perubahan
+            $pendaftaran->id_admin = Auth::id(); // Ambil ID pengguna (Admin) yang sedang login
+        }
+        
         $pendaftaran->status = $validated['status'];
         $pendaftaran->save();
 

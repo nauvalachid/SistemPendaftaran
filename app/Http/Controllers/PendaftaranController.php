@@ -111,7 +111,7 @@ class PendaftaranController extends Controller
             ));
 
             // Arahkan ke halaman detail pendaftaran dengan pesan sukses.
-            return redirect()->route('pendaftaran.create')
+            return redirect()->route('pendaftaran.index')
                 ->with('success', 'Pendaftaran berhasil dikirim! Silahkan cek status pendaftaran Anda.');
         }
 
@@ -156,8 +156,8 @@ class PendaftaranController extends Controller
         return $request->validate([
             // Data Siswa
             'nama_siswa' => 'required|string|max:255',
-            'nisn' => 'nullable|string|max:10',
-            'no_telp' => 'nullable|string|max:15',
+            'nisn' => 'nullable|string|max:10', // <--- SUDAH DITAMBAH DI SINI
+            'no_telp' => 'required|string|max:15', // <--- DIUBAH MENJADI 'required' DAN DITAMBAH DI SINI
 
             // Kolom input terpisah
             'tempat_lahir' => 'required|string|max:100',
@@ -222,8 +222,8 @@ class PendaftaranController extends Controller
         // Daftar kolom yang ada di tabel Pendaftaran (kecuali id_user dan timestamps)
         $pendaftaranFields = [
             'nama_siswa',
-            'nisn',
-            'no_telp',
+            'nisn', // <--- SUDAH DITAMBAH DI SINI
+            'no_telp', // <--- SUDAH DITAMBAH DI SINI
             'tempat_tgl_lahir',
             'jenis_kelamin',
             'agama',

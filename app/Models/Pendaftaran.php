@@ -23,6 +23,8 @@ class Pendaftaran extends Model
      */
     protected $fillable = [
         'id_user',
+        'id_admin',
+        'nisn',
         'nama_siswa',
         'tempat_tgl_lahir',
         'jenis_kelamin',
@@ -33,6 +35,7 @@ class Pendaftaran extends Model
         
         // Atribut Orang Tua
         'nama_ayah',
+        'no_telp',
         'nama_ibu',
         'pendidikan_terakhir_ayah',
         'pendidikan_terakhir_ibu',
@@ -53,5 +56,11 @@ class Pendaftaran extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'id_user', 'id_user');
+    }
+
+    public function admin()
+    {
+        // Asumsi Model Admin menggunakan id_admin sebagai primary key
+        return $this->belongsTo(Admin::class, 'id_admin', 'id_admin');
     }
 }

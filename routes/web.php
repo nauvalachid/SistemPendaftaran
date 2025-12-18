@@ -2,9 +2,10 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PendaftaranController;
+use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\LandingPageController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth; 
 use App\Http\Controllers\Admin\AdminPendaftaranController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminExportController;
@@ -75,6 +76,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/pendaftaran/{id}/preview', [PendaftaranController::class, 'previewPdf'])
         ->name('pendaftaran.previewPdf');
+    
+    Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran.index');
+    Route::post('/pembayaran/submit', [PembayaranController::class, 'submit'])->name('pembayaran.submit');
 
 });
 

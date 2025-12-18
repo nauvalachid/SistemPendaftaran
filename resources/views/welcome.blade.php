@@ -173,67 +173,116 @@
                 </div>
             </section>
 
+            {{-- 5. TENAGA PENGAJAR --}}
+            <section id="tenaga-pengajar" class="py-20 bg-white">
+                <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                    <div class="text-center mb-16">
+                        <h2 class="text-3xl md:text-4xl font-extrabold text-black">Tenaga Pengajar</h2>
+                    </div>
+
+                    @if(isset($kontenTenagaPengajar) && $kontenTenagaPengajar->count() > 0)
+                        <div class="relative px-12"> {{-- Padding ekstra untuk tombol navigasi luar --}}
+                            <div class="swiper swiperTenagaPengajar">
+                                <div class="swiper-wrapper">
+                                    @foreach($kontenTenagaPengajar as $guru)
+                                        @php
+                                            $media = $guru->media->first();
+                                            $fotoUrl = $media ? asset('storage/' . $media->file_path) : asset('storage/default-avatar.png');
+                                        @endphp
+                                        <div class="swiper-slide py-4">
+                                            <div class="bg-[#F2E8D9] rounded-2xl shadow-md p-6 flex items-center gap-6 h-48 border border-gray-100 transform transition hover:scale-105">
+                                                {{-- Foto Guru (Box Putih) --}}
+                                                <div class="w-28 h-36 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 shadow-inner">
+                                                    <img src="{{ $fotoUrl }}" alt="{{ $guru->judul }}" class="w-full h-full object-cover">
+                                                </div>
+                                                
+                                                {{-- Info Guru --}}
+                                                <div class="flex flex-col">
+                                                    <h3 class="text-xl font-bold text-black leading-tight">{{ $guru->judul }}</h3>
+                                                    <p class="text-gray-700 mt-1 font-medium">{{ $guru->isi }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                
+                                {{-- Navigasi Bullets (Titik-titik di bawah) --}}
+                                <div class="swiper-pagination !-bottom-10"></div>
+                            </div>
+
+                            {{-- Tombol Navigasi (Panah di Samping) --}}
+                            <div class="swiper-button-prev !text-[#002060] !left-0 after:!text-3xl font-bold"></div>
+                            <div class="swiper-button-next !text-[#002060] !right-0 after:!text-3xl font-bold"></div>
+                        </div>
+                    @else
+                        <div class="text-center py-12">
+                            <p class="text-gray-500">Data tenaga pengajar belum tersedia.</p>
+                        </div>
+                    @endif
+                </div>
+            </section>
+
            {{-- 4. PPDB --}}
-@if($kontenPPDB)
-<section id="ppdb" class="py-20 bg-white relative overflow-hidden">
-    <div class="max-w-6xl mx-auto px-6 lg:px-8 relative z-10">
-        
-        {{-- HEADER: Judul dan Subjudul (Tengah) --}}
-        <div class="text-center mb-12 lg:mb-16">
-            <h2 class="text-2xl md:text-3xl font-extrabold text-black mb-2">
-                {!! nl2br(e($kontenPPDB->judul)) !!}
-            </h2>
-            @if(isset($kontenPPDB->sub_judul) && $kontenPPDB->sub_judul)
-                <h3 class="text-xl md:text-2xl font-bold text-black">
-                    {{ $kontenPPDB->sub_judul }}
-                </h3>
-            @endif
-        </div>
-
-        {{-- KONTEN UTAMA: Grid 2 Kolom --}}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            
-            {{-- KOLOM KIRI: Teks Ajakan & Tombol --}}
-            <div class="flex flex-col items-start text-left">
-                <h4 class="text-2xl md:text-3xl font-bold text-[#002060] mb-6 leading-tight">
-                    Ayo bergabung dengan kami!
-                </h4>
+        @if($kontenPPDB)
+        <section id="ppdb" class="py-20 bg-white relative overflow-hidden">
+            <div class="max-w-6xl mx-auto px-6 lg:px-8 relative z-10">
                 
-                <a href="/pendaftaran" 
-                   class="inline-flex items-center justify-center px-8 py-3 text-base font-bold text-white transition-all duration-200 bg-[#002060] rounded-xl hover:bg-blue-900 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                    Daftar Sekarang
-                </a>
+                {{-- HEADER: Judul dan Subjudul (Tengah) --}}
+                <div class="text-center mb-12 lg:mb-16">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-black mb-2">
+                        {!! nl2br(e($kontenPPDB->judul)) !!}
+                    </h2>
+                    @if(isset($kontenPPDB->sub_judul) && $kontenPPDB->sub_judul)
+                        <h3 class="text-xl md:text-2xl font-bold text-black">
+                            {{ $kontenPPDB->sub_judul }}
+                        </h3>
+                    @endif
+                </div>
+
+                {{-- KONTEN UTAMA: Grid 2 Kolom --}}
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    
+                    {{-- KOLOM KIRI: Teks Ajakan & Tombol --}}
+                    <div class="flex flex-col items-start text-left">
+                        <h4 class="text-2xl md:text-3xl font-bold text-[#002060] mb-6 leading-tight">
+                            Ayo bergabung dengan kami!
+                        </h4>
+                        
+                        <a href="/pendaftaran" 
+                        class="inline-flex items-center justify-center px-8 py-3 text-base font-bold text-white transition-all duration-200 bg-[#002060] rounded-xl hover:bg-blue-900 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                            Daftar Sekarang
+                        </a>
+                    </div>
+
+                    {{-- KOLOM KANAN: Kartu Syarat Pendaftaran --}}
+                    <div class="bg-white p-8 rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.08)] border border-gray-100">
+                        <h5 class="text-xl font-bold text-black mb-4">Syarat Pendaftaran :</h5>
+                        
+                        {{-- List Syarat (Dibuat Hardcode agar rapi sesuai gambar) --}}
+                        <ol class="list-decimal list-outside ml-5 space-y-3 text-gray-800 font-medium">
+                            <li>Mengisi formulir pendaftaran.</li>
+                            <li>
+                                Melengkapi berkas :
+                                <ul class="list-disc list-outside ml-5 mt-1 space-y-1 text-gray-700">
+                                    <li>Kartu Keluarga;</li>
+                                    <li>Akte Kelahiran;</li>
+                                    <li>Ijazah TK (Jika Ada);</li>
+                                    <li>Pas Foto.</li>
+                                </ul>
+                            </li>
+                            <li>Melakukan pembayaran administrasi.</li>
+                        </ol>
+                        
+                        {{-- OPSI: Jika ingin tetap menampilkan teks dari database di bawah list hardcode, hapus komentar di bawah ini --}}
+                        {{-- <div class="mt-4 prose prose-sm text-gray-600">
+                            {!! nl2br(e($kontenPPDB->isi)) !!}
+                        </div> --}}
+                    </div>
+
+                </div>
             </div>
-
-            {{-- KOLOM KANAN: Kartu Syarat Pendaftaran --}}
-            <div class="bg-white p-8 rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.08)] border border-gray-100">
-                <h5 class="text-xl font-bold text-black mb-4">Syarat Pendaftaran :</h5>
-                
-                {{-- List Syarat (Dibuat Hardcode agar rapi sesuai gambar) --}}
-                <ol class="list-decimal list-outside ml-5 space-y-3 text-gray-800 font-medium">
-                    <li>Mengisi formulir pendaftaran.</li>
-                    <li>
-                        Melengkapi berkas :
-                        <ul class="list-disc list-outside ml-5 mt-1 space-y-1 text-gray-700">
-                            <li>Kartu Keluarga;</li>
-                            <li>Akte Kelahiran;</li>
-                            <li>Ijazah TK (Jika Ada);</li>
-                            <li>Pas Foto.</li>
-                        </ul>
-                    </li>
-                    <li>Melakukan pembayaran administrasi.</li>
-                </ol>
-                
-                {{-- OPSI: Jika ingin tetap menampilkan teks dari database di bawah list hardcode, hapus komentar di bawah ini --}}
-                {{-- <div class="mt-4 prose prose-sm text-gray-600">
-                    {!! nl2br(e($kontenPPDB->isi)) !!}
-                </div> --}}
-            </div>
-
-        </div>
-    </div>
-</section>
-@endif
+        </section>
+        @endif
             
         </div>
 
