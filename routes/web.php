@@ -5,11 +5,12 @@ use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\LandingPageController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\AdminPendaftaranController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminExportController;
 use App\Http\Controllers\Admin\AdminKontenController;
+use App\Http\Controllers\Admin\AdminPembayaranController;
 use Illuminate\Http\Request;
 use App\Models\Pendaftaran;
 
@@ -76,7 +77,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/pendaftaran/{id}/preview', [PendaftaranController::class, 'previewPdf'])
         ->name('pendaftaran.previewPdf');
-    
+
     Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran.index');
     Route::post('/pembayaran/submit', [PembayaranController::class, 'submit'])->name('pembayaran.submit');
 
@@ -111,6 +112,21 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('pendaftaran/{pendaftaran}/reject', [AdminPendaftaranController::class, 'reject'])->name('pendaftaran.reject');
         Route::get('/export/pendaftaran', [AdminExportController::class, 'export'])->name('export.pendaftaran');
         Route::post('/pendaftaran/{id}/status', [AdminPendaftaranController::class, 'update'])->name('pendaftaran.updateStatus');
+
+        Route::get('/pembayaran', [AdminPembayaranController::class, 'index'])->name('pembayaran.index');
+
+        // Rute Detail Tagihan Siswa
+        Route::get('/pembayaran/detail/{tagihan}', [AdminPembayaranController::class, 'show'])->name('pembayaran.show');
+
+        // Rute Verifikasi Pembayaran (AJAX - POST/PATCH)
+        // Menggunakan ID Pembayaran (bukan ID Tagihan) karena satu tagihan bisa banyak cicilan
+        Route::post('/pembayaran/verify/{id}', [AdminPembayaranController::class, 'verify'])->name('pembayaran.verify');
+
+        // Rute Tolak Pembayaran (AJAX - POST)
+        Route::post('/pembayaran/reject/{id}', [AdminPembayaranController::class, 'reject'])->name('pembayaran.reject');
+
+        // Rute Lihat Bukti Transfer
+        Route::get('/pembayaran/bukti/{pembayaran}', [AdminPembayaranController::class, 'viewBukti'])->name('pembayaran.view-bukti');
 
         /*
         |--------------------------------------------------------------------------

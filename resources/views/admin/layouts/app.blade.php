@@ -9,6 +9,12 @@
     <title>Admin Dashboard | @yield('title', 'Sistem Pendaftaran')</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/logout.js'])
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+
+    @stack('styles')
 </head>
 
 <body class="font-sans antialiased bg-gray-100">
