@@ -49,11 +49,13 @@ class AdminPembayaranController extends Controller
         switch ($sortBy) {
             case 'nama_asc':
                 $pembayaranQuery->whereHas('pendaftaran', function ($q) {
-                    $q->orderBy('nama_siswa', 'asc'); });
+                    $q->orderBy('nama_siswa', 'asc');
+                });
                 break;
             case 'nama_desc':
                 $pembayaranQuery->whereHas('pendaftaran', function ($q) {
-                    $q->orderBy('nama_siswa', 'desc'); });
+                    $q->orderBy('nama_siswa', 'desc');
+                });
                 break;
             case 'tagihan_high':
                 $pembayaranQuery->orderBy('total_tagihan', 'desc');
@@ -99,27 +101,25 @@ class AdminPembayaranController extends Controller
         try {
             $pembayaran = Pembayaran::findOrFail($id);
 
-            // Set ID Admin yang melakukan verifikasi (Audit Trail)
-            $pembayaran->id_admin = Auth::id();
+            // 1. Update status_konfirmasi pada tabel Pembayaran
             $pembayaran->status_konfirmasi = 'Dikonfirmasi';
+            $pembayaran->id_admin = Auth::id();
             $pembayaran->save();
 
-            // Cek apakah status tagihan utama perlu diupdate menjadi Lunas
-            $tagihan = Tagihan::find($pembayaran->tagihan_id);
+            // 2. Ambil data Tagihan terkait
+            $tagihan = Tagihan::findOrFail($pembayaran->tagihan_id);
+
+            // 3. Update status_pembayaran jika sisa sudah nol
             if ($tagihan->sisa_tagihan <= 0) {
-                $tagihan->update(['status_pembayaran' => 'Lunas']);
+                $tagihan->status_pembayaran = 'Lunas';
+                $tagihan->save();
             }
 
             DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Pembayaran berhasil dikonfirmasi.',
-                'status' => 'Dikonfirmasi'
-            ]);
+            return response()->json(['success' => true]);
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['success' => false, 'message' => 'Gagal verifikasi sistem.'], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
