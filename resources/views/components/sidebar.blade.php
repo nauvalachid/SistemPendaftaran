@@ -1,9 +1,28 @@
 <aside class="flex h-screen w-64 flex-col overflow-y-auto bg-white px-5 py-6 border-r border-gray-100 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
 
+    {{-- Penentuan User yang Sedang Login --}}
+    @php
+        $isLoggedAsAdmin = Auth::guard('admin')->check();
+        $isLoggedAsTU = Auth::guard('tata_usaha')->check();
+        
+        // Ambil data user & label berdasarkan guard yang aktif
+        if ($isLoggedAsAdmin) {
+            $user = Auth::guard('admin')->user();
+            $roleLabel = 'Administrator';
+        } else {
+            $user = Auth::guard('tata_usaha')->user();
+            $roleLabel = 'Tata Usaha';
+        }
+
+        // Variabel penentu hak akses menu (Hanya admin asli yang bisa lihat menu pendaftaran & pembayaran)
+        $canAccessAll = $isLoggedAsAdmin;
+    @endphp
+
     <div class="flex justify-center mb-8">
         <img src="{{ asset('storage/logosd.png') }}" alt="Logo Sekolah" class="h-12 w-auto object-contain">
     </div>
 
+    {{-- Bagian Profil --}}
     <a href="{{ route('admin.dashboard') }}" 
        class="flex items-center gap-3 px-3 py-3 mb-6 rounded-2xl bg-gray-50 border border-gray-100 hover:border-indigo-100 hover:shadow-sm transition-all duration-300 group">
         
@@ -15,56 +34,29 @@
 
         <div class="flex flex-col">
             <h2 class="text-sm font-bold text-gray-800 group-hover:text-indigo-700 transition-colors">
-                {{ Str::limit(Auth::guard('admin')->user()->nama ?? 'Super Admin', 15) }}
+                {{ Str::limit($user->nama ?? 'User', 15) }}
             </h2>
-            <p class="text-xs font-medium text-gray-400 group-hover:text-indigo-400 transition-colors">Administrator</p>
+            <p class="text-xs font-medium text-gray-400 group-hover:text-indigo-400 transition-colors">
+                {{ $roleLabel }}
+            </p>
         </div>
     </a>
 
-    {{-- Catatan: Tidak pakai 'flex-1' agar menu tidak mendorong elemen bawah --}}
     <nav class="flex flex-col space-y-1.5">
 
-        {{-- Dashboard --}}
+        {{-- Dashboard (Bisa diakses Admin & Tata Usaha) --}}
         @php $isActive = request()->routeIs('admin.dashboard'); @endphp
         <a href="{{ route('admin.dashboard') }}"
             class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
-            @if ($isActive) 
-                {{-- Warna Latar dan Teks Tautan Saat Aktif --}}
-                bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100
-            @else 
-                {{-- Warna Teks Tautan Default --}}
-                text-gray-500 font-medium hover:bg-gray-50 hover:text-gray-900 
-            @endif">
+            @if ($isActive) bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100
+            @else text-gray-500 font-medium hover:bg-gray-50 hover:text-gray-900 @endif">
             
-            {{-- MENGGUNAKAN IMPORT DARI public/icons/dashboard.svg --}}
             <img src="{{ asset('icons/dashboard.svg') }}" alt="Dashboard Icon"
-                class="h-5 w-5 transition-colors 
-                
-                {{-- Kelas ini akan mewarnai SVG hanya jika SVG menggunakan currentColor --}}
-                text-gray-700 group-hover:text-gray-900" 
-            >
-            
+                class="h-5 w-5 transition-colors text-gray-700 group-hover:text-gray-900">
             <span>Dashboard</span>
         </a>
 
-        {{-- Pendaftaran --}}
-        @php $isActive = request()->routeIs('admin.pendaftaran.index'); @endphp
-        <a href="{{ route('admin.pendaftaran.index') }}"
-           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
-           @if ($isActive) 
-               bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100
-           @else 
-               text-gray-500 font-medium hover:bg-gray-50 hover:text-gray-900 
-           @endif">
-
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="{{ $isActive ? '2' : '1.5' }}" stroke="currentColor" 
-                 class="h-5 w-5 transition-colors {{ $isActive ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600' }}">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-            </svg>
-            <span>Pendaftaran</span>
-        </a>
-
-        {{-- Konten --}}
+        {{-- Konten (Bisa diakses Admin & Tata Usaha) --}}
         @php $isActive = request()->routeIs('admin.konten.index*'); @endphp
         <a href="{{ route('admin.konten.index') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
@@ -81,30 +73,48 @@
             <span>Konten</span>
         </a>
 
-        {{-- Pembayaran --}}
-        @php $isActive = request()->routeIs('admin.pembayaran.*'); @endphp
-        <a href="{{ route('admin.pembayaran.index') }}"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
-            @if ($isActive) 
-                bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100
-            @else 
-                text-gray-500 font-medium hover:bg-gray-50 hover:text-gray-900 
-            @endif">
+        {{-- MENU KHUSUS ADMIN (Hidden untuk Tata Usaha) --}}
+        @if($canAccessAll)
+            {{-- Pendaftaran --}}
+            @php $isActive = request()->routeIs('admin.pendaftaran.index'); @endphp
+            <a href="{{ route('admin.pendaftaran.index') }}"
+               class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+               @if ($isActive) 
+                   bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100
+               @else 
+                   text-gray-500 font-medium hover:bg-gray-50 hover:text-gray-900 
+               @endif">
 
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="{{ $isActive ? '2' : '1.5' }}" stroke="currentColor" 
-                    class="h-5 w-5 transition-colors {{ $isActive ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600' }}">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h16.5M3.75 20.25h16.5M3.75 16.5h16.5M3.75 12h16.5M3.75 8.25h16.5m1.5 0v11.25c0 .754-.726 1.294-1.453 1.096a60.115 60.115 0 01-1.547-.447M21 8.25V4.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 4.5v15.75c0 .754.726 1.294 1.453 1.096a60.115 60.115 0 013.297-1.346" />
-            </svg>
-            <span>Pembayaran</span>
-        </a>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="{{ $isActive ? '2' : '1.5' }}" stroke="currentColor" 
+                     class="h-5 w-5 transition-colors {{ $isActive ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600' }}">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                </svg>
+                <span>Pendaftaran</span>
+            </a>
+
+            {{-- Pembayaran --}}
+            @php $isActive = request()->routeIs('admin.pembayaran.*'); @endphp
+            <a href="{{ route('admin.pembayaran.index') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+                @if ($isActive) 
+                    bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100
+                @else 
+                    text-gray-500 font-medium hover:bg-gray-50 hover:text-gray-900 
+                @endif">
+
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="{{ $isActive ? '2' : '1.5' }}" stroke="currentColor" 
+                        class="h-5 w-5 transition-colors {{ $isActive ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600' }}">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h16.5M3.75 20.25h16.5M3.75 16.5h16.5M3.75 12h16.5M3.75 8.25h16.5m1.5 0v11.25c0 .754-.726 1.294-1.453 1.096a60.115 60.115 0 01-1.547-.447M21 8.25V4.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 4.5v15.75c0 .754.726 1.294 1.453 1.096a60.115 60.115 0 013.297-1.346" />
+                </svg>
+                <span>Pembayaran</span>
+            </a>
+        @endif
 
     </nav>
 
-    <div class="mt-2">
-        {{-- Garis Pemisah --}}
+    <div class="mt-auto">
         <div class="my-2 border-t border-gray-100"></div>
 
-        {{-- Tombol Logout (Desain Baru) --}}
         <a href="#" id="logoutButton"
            class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 font-medium transition-all duration-200 hover:bg-rose-50 hover:text-rose-600 hover:shadow-sm group">
             
@@ -116,7 +126,7 @@
         </a>
     </div>
 
-    @auth
+    @if(Auth::guard('admin')->check() || Auth::guard('tata_usaha')->check())
         @vite('resources/js/logout.js')
-    @endauth
+    @endif
 </aside>

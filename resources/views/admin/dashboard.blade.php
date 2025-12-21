@@ -10,8 +10,13 @@
 
         <main class="w-full overflow-y-auto p-6 lg:p-6">
             <div>
-                <h1 class="text-3xl font-bold text-black">Dashboard {{ Auth::guard('admin')->user()->nama ?? 'Admin' }}</h1>
-                <p class="mt-2 text-black">Selamat datang di Dashboard Admin!</p>
+                <h1 class="text-3xl font-bold text-black">
+                    Dashboard {{ Auth::guard('admin')->user()->nama ?? Auth::guard('tata_usaha')->user()->nama ?? 'Staff' }}
+                </h1>
+                <p class="mt-2 text-black">
+                    Selamat datang di Dashboard
+                    {{ Auth::guard('admin')->check() ? 'Admin' : 'Tata Usaha' }}!
+                </p>
             </div>
 
             <hr class="my-5 h-px border-0 bg-black">
@@ -27,9 +32,12 @@
                         Pendaftar Periode {{ $tahunSekarang }}/{{ $tahunBerikutnya }}
                     </h2>
 
-                    <a href="{{ route('admin.pendaftaran.index') }}" class="text-sm text-gray-500 hover:text-gray-800">
-                        Detail &gt;
-                    </a>
+                    {{-- Hanya Admin yang bisa melihat link Detail --}}
+                    @auth('admin')
+                        <a href="{{ route('admin.pendaftaran.index') }}" class="text-sm text-gray-500 hover:text-gray-800">
+                            Detail &gt;
+                        </a>
+                    @endauth
                 </div>
 
                 <div class="flex flex-wrap justify-center gap-40">

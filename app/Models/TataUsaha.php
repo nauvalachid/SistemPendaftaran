@@ -15,12 +15,13 @@ class TataUsaha extends Authenticatable
     
     // Definisikan Primary Key jika namanya bukan 'id'
     protected $primaryKey = 'id_tu';
+
+    protected $guard = 'tata_usaha';
     
     // Definisikan field yang bisa diisi (Fillable)
     protected $fillable = [
         'nama',
         'username',
-        'email',
         'password',
     ];
 

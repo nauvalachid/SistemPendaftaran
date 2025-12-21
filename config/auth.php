@@ -45,11 +45,11 @@ return [
             'driver' => 'session',
             'provider' => 'admin', // Mengacu ke provider 'admins'
         ],
-        // // TATA USAHA GUARD
-        // 'tata_usaha' => [
-        //     'driver' => 'session',
-        //     'provider' => 'tata_usaha', // Mengacu ke provider 'tata_usahas'
-        // ],
+        // TATA USAHA GUARD
+        'tata_usaha' => [
+            'driver' => 'session',
+            'provider' => 'tata_usaha', 
+        ],
     ],
 
     /*
@@ -77,7 +77,12 @@ return [
 
         'admin' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Admin::class, // HARUS menunjuk ke Model yang benar
+            'model' => App\Models\Admin::class,
+        ],
+
+        'tata_usaha' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\TataUsaha::class,
         ],
     ],
 

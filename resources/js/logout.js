@@ -1,45 +1,53 @@
 document.addEventListener("DOMContentLoaded", () => {
     const logoutBtn = document.getElementById("logoutButton");
 
-    // Jika tombol logout tidak ada, hentikan eksekusi script. (Sudah benar)
     if (!logoutBtn) return; 
 
     logoutBtn.addEventListener("click", async (e) => {
         e.preventDefault();
         
-        // --- START: Perbaikan ---
-        // 1. Ambil elemen meta CSRF
-        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        // 1. Ambil CSRF Token dengan cara yang lebih aman
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
         
-        // 2. Cek apakah elemen meta CSRF ditemukan
-        if (!csrfMeta) {
-            console.error("Meta tag CSRF tidak ditemukan. Tidak dapat melanjutkan logout.");
-            // Optional: Redirect langsung ke halaman utama jika CSRF hilang
-            // window.location.href = "/"; 
+        if (!csrfToken) {
+            console.error("CSRF token not found.");
+            // Jika CSRF hilang, biasanya session expired, arahkan saja ke login
+            window.location.href = "/login";
             return; 
         }
 
-        // 3. Ambil nilai tokennya
-        const csrfToken = csrfMeta.getAttribute("content");
-        // --- END: Perbaikan ---
+        // 2. Cegah double-click (Optimasi UX)
+        logoutBtn.disabled = true;
+        const originalText = logoutBtn.innerHTML;
+        logoutBtn.innerHTML = "Logging out..."; 
 
         try {
             const response = await fetch("/logout", {
                 method: "POST",
                 headers: {
-                    // Gunakan variabel csrfToken yang sudah dijamin ada
                     "X-CSRF-TOKEN": csrfToken, 
                     "Content-Type": "application/json",
+                    "Accept": "application/json", // Penting agar Laravel kirim JSON jika error
                 },
             });
 
             if (response.ok) {
-                window.location.href = "/"; // Redirect ke welcome
+                // Berhasil: Hapus data sensitif di sisi client jika ada (localStorage/sessionStorage)
+                window.location.replace("/"); // replace lebih baik agar user tidak bisa 'Back' ke admin
             } else {
-                console.error("Logout gagal:", response.statusText);
+                // Jika error 419 (CSRF expired), langsung redirect saja
+                if (response.status === 419) {
+                    window.location.href = "/";
+                } else {
+                    throw new Error("Server responded with " + response.status);
+                }
             }
         } catch (error) {
-            console.error("Terjadi kesalahan:", error);
+            console.error("Logout error:", error);
+            // Kembalikan tombol jika gagal agar user bisa coba lagi
+            logoutBtn.disabled = false;
+            logoutBtn.innerHTML = originalText;
+            alert("Gagal logout. Silakan coba lagi atau refresh halaman.");
         }
     });
 });
