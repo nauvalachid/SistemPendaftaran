@@ -95,7 +95,7 @@
                     @endif
                 </div>
 
-                {{-- ISI KONTEN --}}
+                {{-- ISI KONTEN2 --}}
                 
                 {{-- 1. TENTANG SEKOLAH --}}
                 @if ($kat->nama === 'Halaman Tentang Sekolah' || $kat->nama === 'Tentang Sekolah')
